@@ -580,6 +580,15 @@ class RulesHandler {
         const validation = rulesManager.validateRule(rule);
         return validation.valid ? '🟢 Ativa' : '🟠 Inválida';
     }
+
+    formatTrigger(trigger) {
+        if (trigger.type === 'schedule') {
+            const config = trigger.config;
+            if (config.type === 'timer') return `Timer: ${config.value}`;
+            if (config.type === 'time') return `Horário: ${config.value}`;
+        }
+        return trigger.type.toUpperCase();
+    }
 }
 
 module.exports = new RulesHandler();
