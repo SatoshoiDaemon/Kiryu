@@ -62,8 +62,15 @@ class RulesManager {
 
         if (ruleDoc.trigger.type === 'event') {
             const config = ruleDoc.trigger.config;
-            if (!config || !config.event) {
-                return { valid: false, reason: 'Evento para trigger ausente.' };
+            if (!config || !config.event || !['messageCreate', 'messageReactionAdd', 'messageDelete', 'guildMemberAdd', 'guildMemberRemove'].includes(config.event)) {
+                return { valid: false, reason: 'Evento para trigger inválido ou ausente.' };
+            }
+        }
+
+        if (ruleDoc.trigger.type === 'continuous') {
+            const config = ruleDoc.trigger.config;
+            if (!config || !config.type || !['reaction', 'keyword'].includes(config.type)) {
+                return { valid: false, reason: 'Configuração de trigger contínuo inválida.' };
             }
         }
 
@@ -122,7 +129,7 @@ class RulesManager {
                     return true;
                 }
             } else if (ruleDoc.trigger.type === 'event' || ruleDoc.trigger.type === 'continuous') {
-                const event = ruleDoc.trigger.config.event || 'messageCreate';
+                const event = ruleDoc.trigger.config.event || (ruleDoc.trigger.type === 'continuous' ? 'messageCreate' : 'messageCreate');
                 if (!this.eventRules.has(event)) {
                     this.eventRules.set(event, []);
                 }
@@ -170,8 +177,44 @@ class RulesManager {
                         }
                     }
                 });
+            } else if (event === 'messageReactionAdd') {
+                this.client.on('messageReactionAdd', async (reaction, user) => {
+                    for (const ruleId of ruleIds) {
+                        const rule = await Rule.findById(ruleId);
+                        if (rule && this.checkConditions(rule, { reaction, user, message: reaction.message })) {
+                            await this.executeAction(rule, { reaction, user, message: reaction.message });
+                        }
+                    }
+                });
+            } else if (event === 'messageDelete') {
+                this.client.on('messageDelete', async (message) => {
+                    for (const ruleId of ruleIds) {
+                        const rule = await Rule.findById(ruleId);
+                        if (rule && this.checkConditions(rule, message)) {
+                            await this.executeAction(rule, message);
+                        }
+                    }
+                });
+            } else if (event === 'guildMemberAdd') {
+                this.client.on('guildMemberAdd', async (member) => {
+                    for (const ruleId of ruleIds) {
+                        const rule = await Rule.findById(ruleId);
+                        if (rule && this.checkConditions(rule, member)) {
+                            await this.executeAction(rule, member);
+                        }
+                    }
+                });
+            } else if (event === 'guildMemberRemove') {
+                this.client.on('guildMemberRemove', async (member) => {
+                    for (const ruleId of ruleIds) {
+                        const rule = await Rule.findById(ruleId);
+                        if (rule && this.checkConditions(rule, member)) {
+                            await this.executeAction(rule, member);
+                        }
+                    }
+                });
             }
-            // Add more events as needed: messageReactionAdd, etc.
+            // Add more events as needed
         }
     }
 
@@ -317,7 +360,7 @@ class RulesManager {
                     break;
                 }
                 case 'react': {
-                    if (context && context.react) {
+                    if (context && typeof context.react === 'function') {
                         const emoji = ruleDoc.action.payload;
                         await context.react(emoji).catch(() => null);
                     }

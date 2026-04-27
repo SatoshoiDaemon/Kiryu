@@ -19,31 +19,36 @@ class RulesHandler {
         
         // Buttons requiring an active rule context
         if (id.startsWith('rule:edit:')) {
-            const ruleId = id.split(':')[2];
+            const ruleId = id.replace('rule:edit:', '');
             return this.showRuleDetails(interaction, ruleId);
         }
 
         if (id.startsWith('rule:act:')) {
-            const [, , type, ruleId] = id.split(':');
+            const parts = id.split(':');
+            const type = parts[2];
+            const ruleId = parts.slice(3).join(':'); // Handle ruleIds with colons
             if (type === 'status') return this.toggleRuleStatus(interaction, ruleId);
             if (type === 'delete') return this.deleteRule(interaction, ruleId);
             if (type === 'payload') return this.showPayloadModal(interaction, ruleId);
         }
 
-        // Wizard buttons
+        // Wizard buttons - improved parsing
         if (id.startsWith('wizard:')) {
             const parts = id.split(':');
             const action = parts[1];
-            const ruleId = parts[parts.length - 1]; // Última parte é sempre o ruleId
+            const ruleId = parts[parts.length - 1]; // Last part is always ruleId
             
             if (action === 'next1') return this.showWizardPhase2(interaction, ruleId);
             if (action === 'next2') return this.showWizardPhase3(interaction, ruleId);
             if (action === 'next3') return this.showWizardPhase4(interaction, ruleId);
             if (action === 'next4') return this.showPayloadModalForWizard(interaction, ruleId);
+            if (action === 'next5') return this.showWizardPhase6(interaction, ruleId);
+            if (action === 'skip') return this.showWizardPhase6(interaction, ruleId);
             if (action === 'create') return this.createRuleFromWizard(interaction, ruleId);
-            if (action === 'back') return this.showWizardPhase1(interaction);
+            if (action === 'back') return this.handleWizardBack(interaction, ruleId);
             if (action === 'modal') {
                 const type = parts[2];
+                if (type === 'name') return this.showNameModal(interaction, ruleId);
                 if (type === 'timer') return this.showTimerModal(interaction, ruleId);
                 if (type === 'time') return this.showTimeModal(interaction, ruleId);
             }
@@ -87,6 +92,20 @@ class RulesHandler {
             }
 
             if (type === 'schedule_type') {
+                const rule = await Rule.findById(ruleId);
+                rule.trigger.config = { type: value };
+                await rule.save();
+                return this.showWizardPhase3(interaction, ruleId);
+            }
+
+            if (type === 'event_type') {
+                const rule = await Rule.findById(ruleId);
+                rule.trigger.config = { event: value };
+                await rule.save();
+                return this.showWizardPhase3(interaction, ruleId);
+            }
+
+            if (type === 'continuous_type') {
                 const rule = await Rule.findById(ruleId);
                 rule.trigger.config = { type: value };
                 await rule.save();
@@ -149,8 +168,11 @@ class RulesHandler {
 
             if (phase === 'name') {
                 const name = interaction.fields.getTextInputValue('rule_name');
-                await Rule.findByIdAndUpdate(ruleId, { name });
-                return this.showWizardPhase1(interaction);
+                if (!name?.trim()) {
+                    return interaction.reply({ content: '❌ O nome da regra não pode estar vazio.', flags: 64 });
+                }
+                await Rule.findByIdAndUpdate(ruleId, { name: name.trim() });
+                return this.showWizardPhase2(interaction, ruleId);
             }
 
             if (phase === 'timer') {
@@ -326,7 +348,24 @@ class RulesHandler {
 
         const embed = new EmbedBuilder()
             .setColor(PALETTE.primary)
-            .setTitle('🧙‍♂️ Assistente de Criação de Regras - Fase 1/5')
+            .setTitle('🧙‍♂️ Assistente de Criação de Regras - Fase 1/6')
+            .setDescription('Vamos criar uma nova regra! Primeiro, dê um nome para ela.')
+            .setFooter(tengokuFooter('Clique no botão abaixo para definir o nome'));
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`wizard:modal:name:${tempRule._id}`).setLabel('Definir Nome').setStyle(ButtonStyle.Primary)
+        );
+
+        await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+    }
+
+    async showWizardPhase2(interaction, ruleId) {
+        const rule = await Rule.findById(ruleId);
+        if (!rule) return interaction.reply({ content: 'Regra não encontrada.', flags: 64 });
+
+        const embed = new EmbedBuilder()
+            .setColor(PALETTE.primary)
+            .setTitle('🧙‍♂️ Assistente - Fase 2/6: Escolher Gatilho')
             .setDescription('Escolha o tipo de gatilho para sua nova regra.\n\n**Opções:**')
             .addFields(
                 { name: '⏰ Agendamento (Schedule)', value: 'Executa em horários específicos ou intervalos recorrentes.', inline: false },
@@ -337,7 +376,7 @@ class RulesHandler {
 
         const row = new ActionRowBuilder().addComponents(
             new StringSelectMenuBuilder()
-                .setCustomId(`wizard:sel:trigger:${tempRule._id}`)
+                .setCustomId(`wizard:sel:trigger:${ruleId}`)
                 .setPlaceholder('Escolha o tipo de gatilho...')
                 .addOptions([
                     { label: '⏰ Agendamento', value: 'schedule', description: 'Horários ou intervalos fixos' },
@@ -346,44 +385,7 @@ class RulesHandler {
                 ])
         );
 
-        await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
-    }
-
-    async showWizardPhase2(interaction, ruleId) {
-        const rule = await Rule.findById(ruleId);
-        if (!rule) return interaction.reply({ content: 'Regra não encontrada.', flags: 64 });
-
-        let embed, components;
-
-        if (rule.trigger.type === 'schedule') {
-            embed = new EmbedBuilder()
-                .setColor(PALETTE.primary)
-                .setTitle('🧙‍♂️ Assistente - Fase 2/5: Configurar Agendamento')
-                .setDescription('Como você quer que a regra seja executada?')
-                .setFooter(tengokuFooter('Escolha o tipo de agendamento'));
-
-            components = [new ActionRowBuilder().addComponents(
-                new StringSelectMenuBuilder()
-                    .setCustomId(`wizard:sel:schedule_type:${ruleId}`)
-                    .setPlaceholder('Tipo de agendamento...')
-                    .addOptions([
-                        { label: '⏱️ Timer', value: 'timer', description: 'Intervalo recorrente (ex: a cada 30 minutos)' },
-                        { label: '🕐 Horário', value: 'time', description: 'Horário específico (ex: 12:00 todos os dias)' }
-                    ])
-            )];
-        } else if (rule.trigger.type === 'event') {
-            // For simplicity, assume messageCreate for now
-            rule.trigger.config = { event: 'messageCreate' };
-            await rule.save();
-            return this.showWizardPhase3(interaction, ruleId);
-        } else if (rule.trigger.type === 'continuous') {
-            // For continuous, assume reaction
-            rule.trigger.config = { type: 'reaction' };
-            await rule.save();
-            return this.showWizardPhase3(interaction, ruleId);
-        }
-
-        await interaction.update({ embeds: [embed], components });
+        await interaction.update({ embeds: [embed], components: [row] });
     }
 
     async showWizardPhase3(interaction, ruleId) {
@@ -396,7 +398,7 @@ class RulesHandler {
             if (rule.trigger.config.type === 'timer') {
                 embed = new EmbedBuilder()
                     .setColor(PALETTE.primary)
-                    .setTitle('🧙‍♂️ Assistente - Fase 3/5: Configurar Timer')
+                    .setTitle('🧙‍♂️ Assistente - Fase 3/6: Configurar Timer')
                     .setDescription('Defina o intervalo do timer.\n\n**Formatos aceitos:**\n- `30s` (segundos)\n- `5m` (minutos)\n- `2h` (horas)\n- `1d` (dias)')
                     .setFooter(tengokuFooter('Clique no botão abaixo para definir'));
 
@@ -407,7 +409,7 @@ class RulesHandler {
             } else if (rule.trigger.config.type === 'time') {
                 embed = new EmbedBuilder()
                     .setColor(PALETTE.primary)
-                    .setTitle('🧙‍♂️ Assistente - Fase 3/5: Configurar Horário')
+                    .setTitle('🧙‍♂️ Assistente - Fase 3/6: Configurar Horário')
                     .setDescription('Defina o horário específico.\n\n**Formato:** `HH:MM` (ex: `12:00`, `16:30`)')
                     .setFooter(tengokuFooter('Clique no botão abaixo para definir'));
 
@@ -420,7 +422,7 @@ class RulesHandler {
             // For event/continuous, go to action selection
             embed = new EmbedBuilder()
                 .setColor(PALETTE.primary)
-                .setTitle('🧙‍♂️ Assistente - Fase 3/5: Escolher Ação')
+                .setTitle('🧙‍♂️ Assistente - Fase 3/6: Escolher Ação')
                 .setDescription('O que a regra deve fazer quando ativada?')
                 .setFooter(tengokuFooter('Selecione a ação'));
 
@@ -434,7 +436,10 @@ class RulesHandler {
                         { label: '🧹 Limpar Mensagens', value: 'purge', description: 'Deleta mensagens recentes' },
                         { label: '💬 Enviar Mensagem', value: 'send', description: 'Envia uma mensagem no canal' },
                         { label: '😀 Reagir com Emoji', value: 'react', description: 'Adiciona reação à mensagem' }
-                    ])
+                    ]),
+                new ActionRowBuilder().addComponents(
+                    new ButtonBuilder().setCustomId(`wizard:back:${ruleId}`).setLabel('Voltar').setStyle(ButtonStyle.Secondary)
+                )
             )];
         }
 
@@ -447,7 +452,7 @@ class RulesHandler {
 
         const embed = new EmbedBuilder()
             .setColor(PALETTE.primary)
-            .setTitle('🧙‍♂️ Assistente - Fase 4/5: Configurar Ação')
+            .setTitle('🧙‍♂️ Assistente - Fase 4/6: Configurar Ação')
             .setDescription('Configure os detalhes da ação.')
             .addFields(
                 { name: 'Ação Selecionada', value: rule.action.type.toUpperCase(), inline: true },
@@ -476,46 +481,46 @@ class RulesHandler {
 
         const embed = new EmbedBuilder()
             .setColor(PALETTE.primary)
-            .setTitle('🧙‍♂️ Assistente - Fase 5/5: Finalizar')
-            .setDescription('Revise as configurações e ative a regra.')
+            .setTitle('🧙‍♂️ Assistente - Fase 5/6: Adicionar Condições (Opcional)')
+            .setDescription('Deseja adicionar condições para quando a regra deve ser executada?\n\n**Condições disponíveis:**\n- **Conteúdo**: Verificar se a mensagem contém certas palavras\n- **Canal**: Executar apenas em canais específicos\n- **Autor**: Executar apenas para usuários específicos\n- **Horário**: Executar apenas em determinados horários')
             .addFields(
-                { name: 'Nome', value: rule.name, inline: true },
-                { name: 'Gatilho', value: this.formatTrigger(rule.trigger), inline: true },
-                { name: 'Ação', value: `${rule.action.type.toUpperCase()} em <#${rule.action.targetChannelId}>`, inline: true },
-                { name: 'Payload', value: rule.action.payload || 'Nenhum', inline: true },
-                { name: 'Timezone', value: rule.timezone, inline: true }
+                { name: 'Condições Atuais', value: rule.conditions?.length > 0 ? rule.conditions.map(c => `${c.field}: ${c.operator} "${c.value}"`).join('\n') : 'Nenhuma condição definida', inline: false }
             )
-            .setFooter(tengokuFooter('Clique em Criar para ativar a regra'));
+            .setFooter(tengokuFooter('Você pode pular esta etapa se não precisar de condições'));
 
         const row = new ActionRowBuilder().addComponents(
-            new ButtonBuilder().setCustomId(`wizard:create:${ruleId}`).setLabel('✅ Criar Regra').setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId(`wizard:next5:${ruleId}`).setLabel('Adicionar Condição').setStyle(ButtonStyle.Primary),
+            new ButtonBuilder().setCustomId(`wizard:skip:${ruleId}`).setLabel('Pular para Finalizar').setStyle(ButtonStyle.Secondary),
             new ButtonBuilder().setCustomId(`wizard:back:${ruleId}`).setLabel('Voltar').setStyle(ButtonStyle.Secondary)
         );
 
         await interaction.update({ embeds: [embed], components: [row] });
     }
 
-    async createRuleFromWizard(interaction, ruleId) {
+    async handleWizardBack(interaction, ruleId) {
         const rule = await Rule.findById(ruleId);
         if (!rule) return interaction.reply({ content: 'Regra não encontrada.', flags: 64 });
 
-        rule.enabled = true;
-        await rule.save();
-        rulesManager.loadRule(rule);
-
-        const embed = new EmbedBuilder()
-            .setColor(PALETTE.success)
-            .setTitle('✅ Regra Criada com Sucesso!')
-            .setDescription(`A regra "${rule.name}" foi criada e ativada.`)
-            .setFooter(tengokuFooter());
-
-        await interaction.update({ embeds: [embed], components: [] });
+        // Determine which phase we're in based on rule state
+        if (rule.trigger.config && rule.trigger.config.type) {
+            // We're in phase 3 or later, go back to phase 2
+            return this.showWizardPhase2(interaction, ruleId);
+        } else if (rule.trigger.type && rule.trigger.type !== 'schedule') {
+            // For event/continuous, go back to phase 1
+            return this.showWizardPhase1(interaction);
+        } else if (rule.trigger.type === 'schedule') {
+            // Schedule without config means we're in phase 2
+            return this.showWizardPhase1(interaction);
+        } else {
+            // Default to phase 1
+            return this.showWizardPhase1(interaction);
+        }
     }
 
-    async showTimerModal(interaction, ruleId) {
-        const modal = new ModalBuilder().setCustomId(`modal:wizard:timer:${ruleId}`).setTitle('Definir Timer');
+    async showNameModal(interaction, ruleId) {
+        const modal = new ModalBuilder().setCustomId(`modal:wizard:name:${ruleId}`).setTitle('Nome da Regra');
         modal.addComponents(new ActionRowBuilder().addComponents(
-            new TextInputBuilder().setCustomId('timer_value').setLabel('Intervalo (ex: 30m)').setStyle(TextInputStyle.Short).setRequired(true)
+            new TextInputBuilder().setCustomId('rule_name').setLabel('Nome da Regra').setStyle(TextInputStyle.Short).setRequired(true).setPlaceholder('Ex: Limpeza diária do chat')
         ));
         await interaction.showModal(modal);
     }
@@ -555,6 +560,49 @@ class RulesHandler {
         await interaction.showModal(modal);
     }
 
+    async showWizardPhase6(interaction, ruleId) {
+        const rule = await Rule.findById(ruleId);
+        if (!rule) return interaction.reply({ content: 'Regra não encontrada.', flags: 64 });
+
+        const embed = new EmbedBuilder()
+            .setColor(PALETTE.primary)
+            .setTitle('🧙‍♂️ Assistente - Fase 6/6: Finalizar')
+            .setDescription('Revise as configurações e ative a regra.')
+            .addFields(
+                { name: 'Nome', value: rule.name, inline: true },
+                { name: 'Gatilho', value: this.formatTrigger(rule.trigger), inline: true },
+                { name: 'Ação', value: `${rule.action.type.toUpperCase()} em <#${rule.action.targetChannelId}>`, inline: true },
+                { name: 'Payload', value: rule.action.payload || 'Nenhum', inline: true },
+                { name: 'Condições', value: rule.conditions?.length > 0 ? rule.conditions.map(c => `${c.field}: ${c.operator} "${c.value}"`).join('\n') : 'Nenhuma', inline: false },
+                { name: 'Timezone', value: rule.timezone, inline: true }
+            )
+            .setFooter(tengokuFooter('Clique em Criar para ativar a regra'));
+
+        const row = new ActionRowBuilder().addComponents(
+            new ButtonBuilder().setCustomId(`wizard:create:${ruleId}`).setLabel('✅ Criar Regra').setStyle(ButtonStyle.Success),
+            new ButtonBuilder().setCustomId(`wizard:back:${ruleId}`).setLabel('Voltar').setStyle(ButtonStyle.Secondary)
+        );
+
+        await interaction.update({ embeds: [embed], components: [row] });
+    }
+
+    async createRuleFromWizard(interaction, ruleId) {
+        const rule = await Rule.findById(ruleId);
+        if (!rule) return interaction.reply({ content: 'Regra não encontrada.', flags: 64 });
+
+        rule.enabled = true;
+        await rule.save();
+        rulesManager.loadRule(rule);
+
+        const embed = new EmbedBuilder()
+            .setColor(PALETTE.success)
+            .setTitle('✅ Regra Criada com Sucesso!')
+            .setDescription(`A regra "${rule.name}" foi criada e ativada.`)
+            .setFooter(tengokuFooter());
+
+        await interaction.update({ embeds: [embed], components: [] });
+    }
+
     validatePayload(actionType, payload) {
         const value = String(payload || '').trim();
         if (actionType === 'purge') {
@@ -586,8 +634,16 @@ class RulesHandler {
         
         if (trigger.type === 'schedule') {
             const config = trigger.config;
-            if (config.type === 'timer') return `Timer: ${config.value}`;
-            if (config.type === 'time') return `Horário: ${config.value}`;
+            if (config && config.type === 'timer') return `Timer: ${config.value || 'N/A'}`;
+            if (config && config.type === 'time') return `Horário: ${config.value || 'N/A'}`;
+        }
+        if (trigger.type === 'event') {
+            const config = trigger.config;
+            return `Evento: ${config?.event || 'messageCreate'}`;
+        }
+        if (trigger.type === 'continuous') {
+            const config = trigger.config;
+            return `Contínuo: ${config?.type || 'reaction'}`;
         }
         return trigger.type.toUpperCase();
     }
