@@ -582,6 +582,8 @@ class RulesHandler {
     }
 
     formatTrigger(trigger) {
+        if (!trigger || !trigger.type) return 'DESCONHECIDA';
+        
         if (trigger.type === 'schedule') {
             const config = trigger.config;
             if (config.type === 'timer') return `Timer: ${config.value}`;
