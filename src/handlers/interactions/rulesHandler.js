@@ -36,9 +36,11 @@ class RulesHandler {
             if (phase === 'next1') return this.showWizardPhase2(interaction, ruleId);
             if (phase === 'next2') return this.showWizardPhase3(interaction, ruleId);
             if (phase === 'next3') return this.showWizardPhase4(interaction, ruleId);
-            if (phase === 'next4') return this.showWizardPhase5(interaction, ruleId);
+            if (phase === 'next4') return this.showPayloadModalForWizard(interaction, ruleId);
             if (phase === 'create') return this.createRuleFromWizard(interaction, ruleId);
             if (phase === 'back') return this.showWizardPhase1(interaction);
+            if (phase === 'modal:timer') return this.showTimerModal(interaction, ruleId);
+            if (phase === 'modal:time') return this.showTimeModal(interaction, ruleId);
         }
     }
 
@@ -156,20 +158,20 @@ class RulesHandler {
                 return this.showWizardPhase1(interaction);
             }
 
-            if (phase === 'schedule_timer') {
+            if (phase === 'timer') {
                 const value = interaction.fields.getTextInputValue('timer_value');
                 const rule = await Rule.findById(ruleId);
                 rule.trigger.config.value = value;
                 await rule.save();
-                return this.showWizardPhase3(interaction, ruleId);
+                return this.showWizardPhase4(interaction, ruleId);
             }
 
-            if (phase === 'schedule_time') {
+            if (phase === 'time') {
                 const value = interaction.fields.getTextInputValue('time_value');
                 const rule = await Rule.findById(ruleId);
                 rule.trigger.config.value = value;
                 await rule.save();
-                return this.showWizardPhase3(interaction, ruleId);
+                return this.showWizardPhase4(interaction, ruleId);
             }
 
             if (phase === 'payload') {
@@ -401,32 +403,23 @@ class RulesHandler {
                     .setColor(PALETTE.primary)
                     .setTitle('🧙‍♂️ Assistente - Fase 3/5: Configurar Timer')
                     .setDescription('Defina o intervalo do timer.\n\n**Formatos aceitos:**\n- `30s` (segundos)\n- `5m` (minutos)\n- `2h` (horas)\n- `1d` (dias)')
-                    .setFooter(tengokuFooter('Digite o intervalo'));
+                    .setFooter(tengokuFooter('Clique no botão abaixo para definir'));
 
                 components = [new ActionRowBuilder().addComponents(
-                    new ButtonBuilder().setCustomId(`wizard:next3:${ruleId}`).setLabel('Continuar').setStyle(ButtonStyle.Primary)
+                    new ButtonBuilder().setCustomId(`wizard:modal:timer:${ruleId}`).setLabel('Definir Timer').setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId(`wizard:back:${ruleId}`).setLabel('Voltar').setStyle(ButtonStyle.Secondary)
                 )];
-                // Show modal for timer input
-                const modal = new ModalBuilder().setCustomId(`modal:wizard:schedule_timer:${ruleId}`).setTitle('Definir Timer');
-                modal.addComponents(new ActionRowBuilder().addComponents(
-                    new TextInputBuilder().setCustomId('timer_value').setLabel('Intervalo (ex: 30m)').setStyle(TextInputStyle.Short).setRequired(true)
-                ));
-                return interaction.showModal(modal);
             } else if (rule.trigger.config.type === 'time') {
                 embed = new EmbedBuilder()
                     .setColor(PALETTE.primary)
                     .setTitle('🧙‍♂️ Assistente - Fase 3/5: Configurar Horário')
                     .setDescription('Defina o horário específico.\n\n**Formato:** `HH:MM` (ex: `12:00`, `16:30`)')
-                    .setFooter(tengokuFooter('Digite o horário'));
+                    .setFooter(tengokuFooter('Clique no botão abaixo para definir'));
 
                 components = [new ActionRowBuilder().addComponents(
-                    new ButtonBuilder().setCustomId(`wizard:next3:${ruleId}`).setLabel('Continuar').setStyle(ButtonStyle.Primary)
+                    new ButtonBuilder().setCustomId(`wizard:modal:time:${ruleId}`).setLabel('Definir Horário').setStyle(ButtonStyle.Primary),
+                    new ButtonBuilder().setCustomId(`wizard:back:${ruleId}`).setLabel('Voltar').setStyle(ButtonStyle.Secondary)
                 )];
-                const modal = new ModalBuilder().setCustomId(`modal:wizard:schedule_time:${ruleId}`).setTitle('Definir Horário');
-                modal.addComponents(new ActionRowBuilder().addComponents(
-                    new TextInputBuilder().setCustomId('time_value').setLabel('Horário (ex: 12:00)').setStyle(TextInputStyle.Short).setRequired(true)
-                ));
-                return interaction.showModal(modal);
             }
         } else {
             // For event/continuous, go to action selection
@@ -524,13 +517,27 @@ class RulesHandler {
         await interaction.update({ embeds: [embed], components: [] });
     }
 
-    formatTrigger(trigger) {
-        if (trigger.type === 'schedule') {
-            const config = trigger.config;
-            if (config.type === 'timer') return `Timer: ${config.value}`;
-            if (config.type === 'time') return `Horário: ${config.value}`;
-        }
-        return trigger.type.toUpperCase();
+    async showTimerModal(interaction, ruleId) {
+        const modal = new ModalBuilder().setCustomId(`modal:wizard:timer:${ruleId}`).setTitle('Definir Timer');
+        modal.addComponents(new ActionRowBuilder().addComponents(
+            new TextInputBuilder().setCustomId('timer_value').setLabel('Intervalo (ex: 30m)').setStyle(TextInputStyle.Short).setRequired(true)
+        ));
+        await interaction.showModal(modal);
+    }
+
+    async showPayloadModalForWizard(interaction, ruleId) {
+        const rule = await Rule.findById(ruleId);
+        const modal = new ModalBuilder().setCustomId(`modal:wizard:payload:${ruleId}`).setTitle('Definir Payload');
+        const isPurge = rule.action.type === 'purge';
+        const isReact = rule.action.type === 'react';
+        modal.addComponents(new ActionRowBuilder().addComponents(
+            new TextInputBuilder()
+                .setCustomId('rule_payload')
+                .setLabel(isPurge ? 'Quantidade (1-100)' : isReact ? 'Emoji (ex: 👍)' : 'Mensagem')
+                .setStyle(isPurge || isReact ? TextInputStyle.Short : TextInputStyle.Paragraph)
+                .setRequired(true)
+        ));
+        await interaction.showModal(modal);
     }
 
     async showPayloadModal(interaction, ruleId) {

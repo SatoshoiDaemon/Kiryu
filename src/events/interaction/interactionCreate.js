@@ -84,7 +84,7 @@ async function handleSelectMenu(interaction) {
         }
 
         // Menus das Regras Agendadas
-        if (id.startsWith('rule:')) {
+        if (id.startsWith('rule:') || id.startsWith('wizard:')) {
             return await rulesHandler.handleSelect(interaction);
         }
 
