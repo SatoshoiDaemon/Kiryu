@@ -32,15 +32,21 @@ class RulesHandler {
 
         // Wizard buttons
         if (id.startsWith('wizard:')) {
-            const [, phase, ruleId] = id.split(':');
-            if (phase === 'next1') return this.showWizardPhase2(interaction, ruleId);
-            if (phase === 'next2') return this.showWizardPhase3(interaction, ruleId);
-            if (phase === 'next3') return this.showWizardPhase4(interaction, ruleId);
-            if (phase === 'next4') return this.showPayloadModalForWizard(interaction, ruleId);
-            if (phase === 'create') return this.createRuleFromWizard(interaction, ruleId);
-            if (phase === 'back') return this.showWizardPhase1(interaction);
-            if (phase === 'modal:timer') return this.showTimerModal(interaction, ruleId);
-            if (phase === 'modal:time') return this.showTimeModal(interaction, ruleId);
+            const parts = id.split(':');
+            const action = parts[1];
+            const ruleId = parts[parts.length - 1]; // Última parte é sempre o ruleId
+            
+            if (action === 'next1') return this.showWizardPhase2(interaction, ruleId);
+            if (action === 'next2') return this.showWizardPhase3(interaction, ruleId);
+            if (action === 'next3') return this.showWizardPhase4(interaction, ruleId);
+            if (action === 'next4') return this.showPayloadModalForWizard(interaction, ruleId);
+            if (action === 'create') return this.createRuleFromWizard(interaction, ruleId);
+            if (action === 'back') return this.showWizardPhase1(interaction);
+            if (action === 'modal') {
+                const type = parts[2];
+                if (type === 'timer') return this.showTimerModal(interaction, ruleId);
+                if (type === 'time') return this.showTimeModal(interaction, ruleId);
+            }
         }
     }
 
@@ -94,19 +100,8 @@ class RulesHandler {
 
             if (type === 'channel') {
                 await Rule.findByIdAndUpdate(ruleId, { 'action.targetChannelId': value });
-                // Show payload modal
-                const rule = await Rule.findById(ruleId);
-                const modal = new ModalBuilder().setCustomId(`modal:wizard:payload:${ruleId}`).setTitle('Definir Payload');
-                const isPurge = rule.action.type === 'purge';
-                const isReact = rule.action.type === 'react';
-                modal.addComponents(new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('rule_payload')
-                        .setLabel(isPurge ? 'Quantidade (1-100)' : isReact ? 'Emoji (ex: 👍)' : 'Mensagem')
-                        .setStyle(isPurge || isReact ? TextInputStyle.Short : TextInputStyle.Paragraph)
-                        .setRequired(true)
-                ));
-                return interaction.showModal(modal);
+                // Go to payload phase
+                return this.showWizardPhase4(interaction, ruleId);
             }
         }
     }
