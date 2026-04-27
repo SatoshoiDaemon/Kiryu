@@ -1,6 +1,6 @@
 // src/events/interaction/modHandler.js
 // ============================================================
-//   Olympus Community Bot — Handler de Configuração de Moderação
+//   Tengoku Community Bot — Handler de Configuração de Moderação
 // ============================================================
 
 const {
@@ -13,7 +13,7 @@ const {
     TextInputStyle,
 } = require('discord.js');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 
 async function guildColor(guildId) {
@@ -78,7 +78,7 @@ async function showModConfig(interaction) {
                 inline: false,
             },
         )
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     const row1 = new ActionRowBuilder().addComponents(
@@ -139,7 +139,7 @@ async function showWhitelist(interaction) {
             { name: `📢 Canais (${channels.length})`, value: channels.length ? channels.map(c => `<#${c}>`).join(', ') : '`Nenhum`', inline: false },
             { name: `🔗 Links Permitidos (${links.length})`, value: links.length ? links.join(', ') : '`Nenhum`', inline: false },
         )
-        .setFooter(olympusFooter('Para adicionar, informe os IDs separados por vírgula'))
+        .setFooter(tengokuFooter('Para adicionar, informe os IDs separados por vírgula'))
         .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(

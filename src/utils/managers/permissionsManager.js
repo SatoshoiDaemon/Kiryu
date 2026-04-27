@@ -1,13 +1,34 @@
 // src/utils/managers/permissionsManager.js
 // ============================================================
-//   Olympus Community Bot — Gerenciador de Permissões Granular
+//   Tengoku Community Bot — Gerenciador de Permissões Granular
 //   Todas as permissões são armazenadas no banco de dados
 // ============================================================
 
 const CommandPermission = require('@models/CommandPermission');
 const { PermissionFlagsBits } = require('discord.js');
 
+const COMMAND_ALIASES = {
+    pagar: ['pay'],
+    'cara-coroa': ['coinflip'],
+    bot: ['botinfo'],
+    servidor: ['serverinfo'],
+    usuario: ['userinfo'],
+    atividade: ['uptime'],
+    'vinte-e-um': ['blackjack'],
+    'campo-minado': ['mines'],
+    notas: ['notes'],
+    registros: ['logs'],
+    cargo: ['role'],
+    caso: ['case'],
+    transcricao: ['transcript'],
+    nivel: ['level'],
+};
+
 class PermissionsManager {
+    getCommandNames(command) {
+        return [command, ...(COMMAND_ALIASES[command] || [])];
+    }
+
     /**
      * Verifica se um membro tem permissão para executar um comando.
      * Hierarquia: Administrador > Permissão Discord nativa > Permissão por cargo/usuário no BD
@@ -28,9 +49,10 @@ class PermissionsManager {
         const guildId = member.guild.id;
 
         // Verifica por usuário
+        const commandNames = this.getCommandNames(command);
         const userPerm = await CommandPermission.findOne({
             guildId,
-            command,
+            command: { $in: commandNames },
             type: 'user',
             targetId: member.id
         });
@@ -41,7 +63,7 @@ class PermissionsManager {
         if (roleIds.length > 0) {
             const rolePerm = await CommandPermission.findOne({
                 guildId,
-                command,
+                command: { $in: commandNames },
                 type: 'role',
                 targetId: { $in: roleIds }
             });

@@ -1,12 +1,12 @@
 // src/commands/utility/instafeed.js
 // ============================================================
-//   Olympus Community Bot — Comando /instafeed
+//   Tengoku Community Bot — Comando /instafeed
 //   Permite postar imagens diretas no canal de instafeed
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 
 module.exports = {
@@ -65,7 +65,7 @@ module.exports = {
             .setAuthor({ name: `@${interaction.user.username}`, iconURL: interaction.user.displayAvatarURL() })
             .setTitle('📸 Post no Instafeed')
             .setImage(imagem.url)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
             
         if (legenda) {

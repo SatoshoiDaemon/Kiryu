@@ -6,7 +6,7 @@ const {
     StringSelectMenuBuilder,
     StringSelectMenuOptionBuilder,
 } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 const { version } = require('../../../package.json');
 
@@ -26,17 +26,17 @@ module.exports = {
                 `Bem-vindo(a) à central de ajuda!\n\n` +
                 `Use o menu abaixo para navegar pelas categorias de comandos.\n` +
                 `Todos os comandos são executados via **/**.\n\n` +
-                `> Desenvolvido por **Olympus Studio** — v${version}`
+                `> Desenvolvido por **Tengoku** — v${version}`
             )
             .addFields(
                 { name: '⚙️ Administração', value: 'Configuração, moderação e gerenciamento do servidor', inline: true },
                 { name: '💰 Economia',       value: 'Sistema de moedas, daily, trabalho e banco', inline: true },
                 { name: '⭐ Utilidades',     value: 'XP, ranking, informações e sugestões', inline: true },
-                { name: '🎮 Diversão',       value: 'Jogos como blackjack e roleta', inline: true },
+                { name: '🎮 Diversão',       value: 'Jogos como vinte e um e roleta', inline: true },
                 { name: '💙 Social',         value: 'Interações sociais e casamentos', inline: true },
             )
             .setThumbnail(interaction.client.user.displayAvatarURL())
-            .setFooter(olympusFooter(`v${version}`))
+            .setFooter(tengokuFooter(`v${version}`))
             .setTimestamp();
 
         const menu = new StringSelectMenuBuilder()
@@ -62,20 +62,20 @@ const CATEGORIES = {
         title: '⚙️ Administração',
         commands: [
             { name: '/ban', desc: 'Bane um usuário do servidor.' },
-            { name: '/case', desc: 'Visualiza detalhes específicos de um caso de moderação (Case ID).' },
+            { name: '/caso', desc: 'Veja detalhes de um caso de moderação.' },
             { name: '/config', desc: 'Painel de configuração do bot para este servidor.' },
             { name: '/embed', desc: 'Abre o construtor visual de embeds e webhooks.' },
             { name: '/emoji', desc: 'Gerencia e visualiza emojis do servidor.' },
-            { name: '/gerenciar', desc: 'Gerencia XP, Level e Dinheiro de um membro (Admin).' },
+            { name: '/gerenciar', desc: 'Gerencie XP, nível e moedas de um membro.' },
             { name: '/hackban', desc: 'Bane um usuário pelo ID, sem que ele esteja no servidor.' },
             { name: '/kick', desc: 'Expulsa um usuário do servidor.' },
             { name: '/limpar', desc: 'Remove mensagens do canal.' },
-            { name: '/logs', desc: 'Visualiza o histórico de moderação do servidor.' },
+            { name: '/registros', desc: 'Veja o histórico de moderação do servidor.' },
             { name: '/mute', desc: 'Silencia (timeout) um usuário no servidor.' },
-            { name: '/notes', desc: 'Gerencie notas de moderação de um membro.' },
-            { name: '/role', desc: 'Gerencia e visualiza informações de cargos do servidor.' },
+            { name: '/notas', desc: 'Gerencie notas de moderação de um membro.' },
+            { name: '/cargo', desc: 'Gerencie e veja informações de cargos do servidor.' },
             { name: '/setup', desc: 'Configurações avançadas do servidor.' },
-            { name: '/transcript', desc: 'Gera um transcript de um canal como arquivo HTML.' },
+            { name: '/transcricao', desc: 'Gere uma transcrição HTML de um canal.' },
             { name: '/unban', desc: 'Desbane um usuário do servidor.' },
             { name: '/unmute', desc: 'Remove o silenciamento (timeout) de um usuário.' },
             { name: '/verificar', desc: 'Verifica um membro manualmente ignorando o captcha.' },
@@ -87,12 +87,12 @@ const CATEGORIES = {
         commands: [
             { name: '/banco', desc: 'Deposite ou saque moedas do banco.' },
             { name: '/carteira', desc: 'Veja o saldo de sua carteira.' },
-            { name: '/coletar', desc: 'Colete seus ganhos no Mines antes de explodir!' },
+            { name: '/coletar', desc: 'Colete seus ganhos no campo minado antes de explodir.' },
             { name: '/daily', desc: 'Colete sua recompensa diária.' },
             { name: '/inventario', desc: 'Veja seu inventário de itens.' },
             { name: '/loja', desc: 'Acesse a loja do servidor.' },
             { name: '/moedas', desc: 'Gerenciamento de moedas (Admin).' },
-            { name: '/pay', desc: 'Transfira moedas da sua carteira para outro usuário.' },
+            { name: '/pagar', desc: 'Transfira moedas da sua carteira para outro usuário.' },
             { name: '/roubar', desc: 'Tente roubar moedas da carteira de outro usuário.' },
             { name: '/trabalhar', desc: 'Trabalhe para ganhar moedas.' }
         ],
@@ -100,9 +100,9 @@ const CATEGORIES = {
     fun: {
         title: '🎮 Diversão',
         commands: [
-            { name: '/blackjack', desc: 'Jogue blackjack contra o dealer.' },
-            { name: '/coinflip', desc: 'Jogue cara ou coroa apostando moedas.' },
-            { name: '/mines', desc: 'Jogue Campo Minado! Revele casas e colete antes de explodir.' },
+            { name: '/vinte-e-um', desc: 'Jogue vinte e um contra o dealer.' },
+            { name: '/cara-coroa', desc: 'Jogue cara ou coroa apostando moedas.' },
+            { name: '/campo-minado', desc: 'Jogue campo minado, revele casas e colete antes de explodir.' },
             { name: '/roleta', desc: 'Aposte na roleta.' }
         ],
     },
@@ -132,16 +132,16 @@ const CATEGORIES = {
             { name: '/ajuda', desc: 'Exibe todos os comandos disponíveis.' },
             { name: '/avatar', desc: 'Mostra a foto de perfil de um usuário.' },
             { name: '/banner', desc: 'Mostra o banner do perfil de um usuário.' },
-            { name: '/botinfo', desc: 'Exibe informações técnicas e estatísticas do bot.' },
+            { name: '/bot', desc: 'Exibe informações técnicas e estatísticas do bot.' },
             { name: '/instafeed', desc: 'Compartilhe uma foto no feed do servidor.' },
             { name: '/lembrete', desc: 'Crie um lembrete para ser notificado depois.' },
             { name: '/parceria', desc: 'Envie uma candidatura de parceria para o servidor.' },
             { name: '/ping', desc: 'Verifica a latência do bot.' },
             { name: '/ranking', desc: 'Veja os rankings do servidor.' },
-            { name: '/serverinfo', desc: 'Exibe informações sobre o servidor atual.' },
+            { name: '/servidor', desc: 'Exibe informações sobre o servidor atual.' },
             { name: '/sugestao', desc: 'Envie uma sugestão para o servidor.' },
-            { name: '/uptime', desc: 'Mostra há quanto tempo o bot está online.' },
-            { name: '/userinfo', desc: 'Exibe informações sobre um usuário.' },
+            { name: '/atividade', desc: 'Mostra há quanto tempo o bot está online.' },
+            { name: '/usuario', desc: 'Exibe informações sobre um usuário.' },
             { name: '/xp', desc: 'Veja seu progresso de nível e XP atual.' }
         ],
     }

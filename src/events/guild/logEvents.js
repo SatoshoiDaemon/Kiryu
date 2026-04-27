@@ -1,12 +1,12 @@
 // src/events/guild/logEvents.js
 // ============================================================
-//   Olympus Community Bot — Logs Avançados
+//   Tengoku Community Bot — Logs Avançados
 //   messageDelete, messageUpdate, voiceStateUpdate, invites
 // ============================================================
 
 const { EmbedBuilder, Events } = require('discord.js');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const logger = require('@utils/logger');
 
 // Cache de guild configs para evitar queries excessivas
@@ -43,7 +43,7 @@ module.exports = [
                     { name: 'Canal', value: `<#${message.channel.id}>`, inline: true },
                     { name: 'Conteúdo', value: message.content ? `\`\`\`${message.content.substring(0, 1000)}\`\`\`` : '`(sem conteúdo ou embed)`', inline: false },
                 )
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             if (message.attachments.size > 0) {
@@ -76,7 +76,7 @@ module.exports = [
                     { name: 'Depois', value: `\`\`\`${(newMessage.content || '(vazio)').substring(0, 500)}\`\`\``, inline: false },
                     { name: '🔗 Link', value: `[Ir à mensagem](${newMessage.url})`, inline: false },
                 )
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             await channel.send({ embeds: [embed] }).catch(() => null);
@@ -114,7 +114,7 @@ module.exports = [
                 .setColor(color)
                 .setTitle(`🎙️ ${action}`)
                 .setDescription(`${member} ${action.toLowerCase()} ${voiceChannel ? `<#${voiceChannel.id}>` : 'um canal de voz'}`)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             await channel.send({ embeds: [embed] }).catch(() => null);
@@ -142,7 +142,7 @@ module.exports = [
                     { name: 'Máx. Usos', value: `${invite.maxUses || '∞'}`, inline: true },
                     { name: 'Expira', value: invite.maxAge ? `<t:${Math.floor(Date.now() / 1000) + invite.maxAge}:R>` : 'Nunca', inline: true },
                 )
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             await channel.send({ embeds: [embed] }).catch(() => null);

@@ -1,7 +1,7 @@
 // src/commands/social/ship.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Marriage = require('@models/Marriage');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -61,7 +61,7 @@ module.exports = {
             .setColor(PALETTE.accent)
             .setTitle(`💖 Ship: ${user1.username} & ${user2.username}`)
             .setDescription(`A afinidade entre os dois é de **${affinityPorcent}%**\n\n${bar}\n\n*${frase}*`)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

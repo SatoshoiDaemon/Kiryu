@@ -1,12 +1,12 @@
 // src/events/guild/antiFake.js
 // ============================================================
-//   Olympus Community Bot — Anti-Fake (guildMemberAdd)
+//   Tengoku Community Bot — Anti-Fake (guildMemberAdd)
 // ============================================================
 
 const { EmbedBuilder } = require('discord.js');
 const Guild = require('@models/Guild');
 const { registerModLog } = require('@utils/helpers/modHelper');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const logger = require('@utils/logger');
 
 module.exports = {
@@ -108,7 +108,7 @@ module.exports = {
                             { name: 'Conta criada em', value: `<t:${Math.floor(member.user.createdTimestamp / 1000)}:R>`, inline: true },
                         )
                         .setThumbnail(member.user.displayAvatarURL())
-                        .setFooter(olympusFooter())
+                        .setFooter(tengokuFooter())
                         .setTimestamp();
                     await logChannel.send({ embeds: [embed] }).catch(() => null);
                 }

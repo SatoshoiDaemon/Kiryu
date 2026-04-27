@@ -2,7 +2,7 @@
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
 const UserData = require('@models/UserData');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 const WORK_MESSAGES = [
     'Você trabalhou como programador e ganhou',
@@ -43,7 +43,7 @@ module.exports = {
                 .setColor(PALETTE.warning)
                 .setTitle('⏳ Você já trabalhou recentemente')
                 .setDescription(`Descanse um pouco! Volte em **${minutes}min ${seconds}s**.`)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             return interaction.reply({ embeds: [embed], flags: 64 });
         }
@@ -64,8 +64,8 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.success)
             .setTitle('💼 Trabalho Concluído!')
-            .setDescription(`${message} **${earned} ${config.currencySymbol} ${config.currencyName}**!`)
-            .setFooter(olympusFooter(`Próximo trabalho em ${Math.floor(config.workCooldown / 60)} minutos`))
+            .setDescription(`${message} **${economyManager.formatCurrency(earned, config, { withName: true })}**!`)
+            .setFooter(tengokuFooter(`Próximo trabalho em ${Math.floor(config.workCooldown / 60)} minutos`))
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

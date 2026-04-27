@@ -5,7 +5,7 @@ const guildSchema = new Schema({
     guildId: { type: String, required: true, unique: true },
     
     branding: {
-        botName: { type: String, default: 'Olympus Bot' },
+        botName: { type: String, default: 'Tengoku Bot' },
         botAvatar: { type: String, default: null },
         embedColor: { type: String, default: '#1a1a2e' },
         accentColor: { type: String, default: '#7b2fff' },

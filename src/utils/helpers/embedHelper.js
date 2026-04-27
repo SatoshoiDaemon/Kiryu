@@ -1,13 +1,13 @@
 // src/utils/helpers/embedHelper.js
 // ============================================================
-//   Olympus Community Bot — Helper de Embeds
+//   Tengoku Community Bot — Helper de Embeds
 //   Paleta: Azul escuro (#1a1a2e), Preto (#0d0d0d), Roxo (#7b2fff)
 // ============================================================
 
 const { EmbedBuilder } = require('discord.js');
 const Guild = require('@models/Guild');
 
-// Paleta padrão Olympus
+// Paleta padrão Tengoku
 const PALETTE = {
     primary:   '#1a1a2e',   // Azul escuro
     accent:    '#7b2fff',   // Roxo vibrante
@@ -116,12 +116,12 @@ function infoEmbed(title, description) {
 }
 
 /**
- * Rodapé padrão Olympus Studio.
+ * Rodapé padrão Tengoku.
  * @param {string} [extra] Texto adicional
  * @returns {Object}
  */
-function olympusFooter(extra) {
-    const text = extra ? `${extra} • Olympus Studio` : 'Olympus Studio';
+function tengokuFooter(extra) {
+    const text = extra ? `${extra} • Tengoku` : 'Tengoku';
     return { text };
 }
 
@@ -151,6 +151,6 @@ module.exports = {
     errorEmbed,
     warningEmbed,
     infoEmbed,
-    olympusFooter,
+    tengokuFooter,
     fetchWaifuImage,
 };

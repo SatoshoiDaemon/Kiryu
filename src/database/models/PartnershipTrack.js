@@ -1,6 +1,6 @@
 // src/database/models/PartnershipTrack.js
 // ============================================================
-//   Olympus Community Bot — Rastreamento de Parcerias por Staff
+//   Tengoku Community Bot — Rastreamento de Parcerias por Staff
 // ============================================================
 
 const { Schema, model } = require('mongoose');

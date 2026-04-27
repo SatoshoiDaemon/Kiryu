@@ -1,7 +1,7 @@
 // src/commands/fun/roleta.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 const COLORS = [
     { name: 'Vermelho', emoji: '🔴', numbers: [1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36] },
@@ -35,7 +35,7 @@ module.exports = {
 
         const userData = await economyManager.getUser(userId, guildId);
         if (userData.balance < aposta) {
-            return interaction.reply({ content: `❌ Você não tem ${aposta} ${config.currencySymbol} na carteira.`, flags: 64 });
+            return interaction.reply({ content: `❌ Você não tem ${economyManager.formatCurrency(aposta, config)} na carteira.`, flags: 64 });
         }
 
         await economyManager.addBalance(userId, guildId, -aposta);
@@ -61,13 +61,13 @@ module.exports = {
             .setColor(won ? PALETTE.success : PALETTE.error)
             .setTitle(`🎰 Roleta — ${colorEmoji} **${number}** (${colorName})`)
             .setDescription(won
-                ? `🎉 Você ganhou! **+${winnings} ${config.currencySymbol}** (${multiplier}x)`
-                : `😔 Você perdeu **${aposta} ${config.currencySymbol}**.`)
+                ? `🎉 Você ganhou! **+${economyManager.formatCurrency(winnings, config)}** (${multiplier}x)`
+                : `😔 Você perdeu **${economyManager.formatCurrency(aposta, config)}**.`)
             .addFields(
                 { name: 'Número sorteado', value: `${colorEmoji} **${number}**`, inline: true },
-                { name: 'Sua aposta', value: `${tipo} — ${aposta} ${config.currencySymbol}`, inline: true },
+                { name: 'Sua aposta', value: `${tipo} — ${economyManager.formatCurrency(aposta, config)}`, inline: true },
             )
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

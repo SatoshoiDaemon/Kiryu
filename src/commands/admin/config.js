@@ -1,6 +1,6 @@
 // src/commands/admin/config.js
 // ============================================================
-//   Olympus Community Bot — Comando /config
+//   Tengoku Community Bot — Comando /config
 //   Painel central de configuração do bot para o servidor
 // ============================================================
 
@@ -14,7 +14,7 @@ const {
     ButtonStyle,
     PermissionFlagsBits,
 } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 
 module.exports = {
@@ -39,7 +39,7 @@ function buildMainEmbed(branding) {
         .setColor(branding.accent)
         .setTitle('⚙️ Painel de Configuração')
         .setDescription(
-            '> Bem-vindo ao painel de configuração do **Olympus Bot**.\n' +
+            '> Bem-vindo ao painel de configuração do **Tengoku Bot**.\n' +
             '> Selecione uma categoria abaixo para configurar as funcionalidades do bot neste servidor.\n\n' +
             '**Categorias disponíveis:**\n' +
             '🤖 **IA** — Configurar o assistente de inteligência artificial\n' +
@@ -51,7 +51,7 @@ function buildMainEmbed(branding) {
             '🚀 **Sistemas** — Sugestões, parcerias, starboard e instafeed\n' +
             '🎨 **Aparência** — Cores, nome e identidade visual do bot'
         )
-        .setFooter(olympusFooter('Use os menus abaixo para navegar'))
+        .setFooter(tengokuFooter('Use os menus abaixo para navegar'))
         .setTimestamp();
 }
 

@@ -1,6 +1,6 @@
 // src/commands/utility/ping.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,7 +27,7 @@ module.exports = {
                 { name: 'Latência do Bot', value: `**${latency}ms** ${getStatus(latency)}`, inline: true },
                 { name: 'Latência da API', value: `**${apiLatency}ms** ${getStatus(apiLatency)}`, inline: true },
             )
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         await interaction.editReply({ content: null, embeds: [embed] });

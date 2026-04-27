@@ -1,6 +1,6 @@
 // src/handlers/interactions/autoResponseHandler.js
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const AutoResponse = require('@models/AutoResponse');
 const autoResponseManager = require('@utils/managers/autoResponseManager');
 
@@ -73,7 +73,7 @@ class AutoResponseHandler {
             .setColor(PALETTE.primary)
             .setTitle('💬 Central de Auto-Respostas')
             .setDescription(`Gerencie gatilhos e respostas dinâmicas.\nO bot escolherá **aleatoriamente** uma resposta cadastrada para o gatilho detectado!\n\n**Gatilhos Ativos:** ${rules.filter(r => r.enabled).length}/${rules.length}`)
-            .setFooter(olympusFooter());
+            .setFooter(tengokuFooter());
 
         const components = [
             new ActionRowBuilder().addComponents(
@@ -112,7 +112,7 @@ class AutoResponseHandler {
             .setTitle(`Gatilho: "${rule.trigger}"`)
             .setDescription(`**Tipo de Match:** \`${rule.matchType}\`\n**Status:** ${rule.enabled ? '🟢 Ativo' : '🔴 Inativo'}`)
             .addFields({ name: 'Respostas Cadastradas', value: rule.responses.length > 0 ? `\`${rule.responses.length}\` respostas no banco. O bot enviará uma delas aleatoriamente a cada trigger.` : 'Nenhuma resposta cadastrada ainda. **O gatilho não funcionará!**' })
-            .setFooter(olympusFooter());
+            .setFooter(tengokuFooter());
 
         const row = new ActionRowBuilder().addComponents(
             new ButtonBuilder().setCustomId(`ar:act:add_reply:${rule._id}`).setLabel('Adicionar Resposta').setStyle(ButtonStyle.Primary),

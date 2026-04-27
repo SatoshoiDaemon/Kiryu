@@ -1,6 +1,6 @@
 // src/commands/admin/regras.js
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const rulesHandler = require('@handlers/interactions/rulesHandler');
 
 module.exports = {

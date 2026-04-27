@@ -1,11 +1,11 @@
 // src/commands/economy/pay.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('pay')
+        .setName('pagar')
         .setDescription('💸 Transfira moedas da sua carteira para outro usuário.')
         .addUserOption(option => 
             option.setName('usuario')
@@ -26,10 +26,10 @@ module.exports = {
         const amount = interaction.options.getInteger('quantidade');
 
         if (sender.id === receiver.id) {
-            return interaction.reply({ content: '❌ Você não pode transferir dinheiro para você mesmo.', flags: 64 });
+            return interaction.reply({ content: '❌ Você não pode transferir moedas para você mesmo.', flags: 64 });
         }
         if (receiver.bot) {
-            return interaction.reply({ content: '❌ Bots não usam dinheiro.', flags: 64 });
+            return interaction.reply({ content: '❌ Bots não usam moedas.', flags: 64 });
         }
 
         const config = await economyManager.getConfig(guildId);
@@ -40,7 +40,7 @@ module.exports = {
         const senderData = await economyManager.getUser(sender.id, guildId);
 
         if (senderData.balance < amount) {
-            return interaction.reply({ content: `❌ Você não tem moedas suficientes na carteira. Saldo atual: **${senderData.balance} ${config.currencySymbol}**`, flags: 64 });
+            return interaction.reply({ content: `❌ Você não tem moedas suficientes na carteira. Saldo atual: **${economyManager.formatCurrency(senderData.balance, config)}**`, flags: 64 });
         }
 
         await economyManager.addBalance(sender.id, guildId, -amount);
@@ -49,8 +49,8 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.success)
             .setTitle('💸 Transferência Concluída!')
-            .setDescription(`Você enviou **${amount} ${config.currencySymbol}** para ${receiver}!`)
-            .setFooter(olympusFooter())
+            .setDescription(`Você enviou **${economyManager.formatCurrency(amount, config)}** para ${receiver}!`)
+            .setFooter(tengokuFooter())
             .setTimestamp();
         
         return interaction.reply({ embeds: [embed] });

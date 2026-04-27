@@ -1,7 +1,7 @@
 // src/utils/managers/reminderTracker.js
 const Reminder = require('@models/Reminder');
 const { EmbedBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const logger = require('@utils/logger');
 
 async function checkReminders(client) {
@@ -13,9 +13,9 @@ async function checkReminders(client) {
             const user = await client.users.fetch(rem.userId);
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.accent)
-                .setTitle('⏰ Olympus Lembrete!')
+                .setTitle('⏰ Tengoku Lembrete!')
                 .setDescription(`Você me pediu para lhe lembrar sobre:\n\n**"${rem.reason}"**`)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             // Tenta enviar via DM primeiro

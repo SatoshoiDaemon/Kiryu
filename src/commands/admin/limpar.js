@@ -1,6 +1,6 @@
 // src/commands/admin/limpar.js
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const permissionsManager = require('@utils/managers/permissionsManager');
 
 module.exports = {
@@ -45,7 +45,7 @@ module.exports = {
                 .setColor(PALETTE.success)
                 .setTitle('🗑️ Mensagens Removidas')
                 .setDescription(`**${deletable.length}** mensagem(ns) removida(s) com sucesso.`)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             return interaction.editReply({ embeds: [embed] });

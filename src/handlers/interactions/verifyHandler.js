@@ -1,6 +1,6 @@
 // src/handlers/interactions/verifyHandler.js
 // ============================================================
-//   Olympus Community Bot — Handler de Verificação Captcha
+//   Tengoku Community Bot — Handler de Verificação Captcha
 // ============================================================
 
 const { 
@@ -15,7 +15,7 @@ const {
 } = require('discord.js');
 const { CaptchaGenerator } = require('captcha-canvas');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const logger = require('@utils/logger');
 
 // Cache em memória dos códigos de captcha: userId -> { code: string, expiresAt: number }
@@ -50,7 +50,7 @@ async function handleVerifyStart(interaction) {
         .setTitle('🛡️ Verificação Humana')
         .setDescription('Identificamos que você quer entrar no servidor! Para prosseguir, digite o código que aparece na imagem abaixo clicando no botão **Responder**.')
         .setImage('attachment://captcha.png')
-        .setFooter(olympusFooter('O código expira em 2 minutos'))
+        .setFooter(tengokuFooter('O código expira em 2 minutos'))
         .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(

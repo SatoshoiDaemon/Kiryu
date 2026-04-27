@@ -1,12 +1,12 @@
 // src/utils/helpers/modHelper.js
 // ============================================================
-//   Olympus Community Bot — Helper de Moderação
+//   Tengoku Community Bot — Helper de Moderação
 // ============================================================
 
 const ModLog = require('@models/ModLog');
 const Guild = require('@models/Guild');
 const { EmbedBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const logger = require('@utils/logger');
 
 /**
@@ -60,7 +60,7 @@ async function createModLog({ guildId, moderatorId, targetId, action, reason, du
                         { name: '🛡️ Moderador', value: moderatorText, inline: true },
                         { name: '📝 Motivo', value: reason || 'Sem motivo informado', inline: false },
                     )
-                    .setFooter(olympusFooter())
+                    .setFooter(tengokuFooter())
                     .setTimestamp();
 
                 if (duration) embed.addFields({ name: '⏱️ Duração', value: duration, inline: true });
@@ -80,7 +80,7 @@ async function createModLog({ guildId, moderatorId, targetId, action, reason, du
                         { name: 'Ação', value: action.toUpperCase(), inline: true },
                         { name: 'Motivo', value: reason || 'Sem motivo informado', inline: true },
                     )
-                    .setFooter(olympusFooter())
+                    .setFooter(tengokuFooter())
                     .setTimestamp();
 
                 if (duration) dmEmbed.addFields({ name: 'Duração', value: duration, inline: true });

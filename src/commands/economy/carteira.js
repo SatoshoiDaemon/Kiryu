@@ -1,7 +1,7 @@
 // src/commands/economy/carteira.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -25,12 +25,12 @@ module.exports = {
             .setColor(PALETTE.primary)
             .setTitle(`💳 Carteira de ${target.username}`)
             .addFields(
-                { name: `${config.currencySymbol} Carteira`, value: `**${data.balance.toLocaleString('pt-BR')}** ${config.currencyName}`, inline: true },
-                { name: '🏦 Banco', value: `**${data.bank.toLocaleString('pt-BR')}** ${config.currencyName}`, inline: true },
-                { name: '💰 Total', value: `**${total.toLocaleString('pt-BR')}** ${config.currencyName}`, inline: true },
+                { name: `${config.currencySymbol} Carteira`, value: `**${economyManager.formatCurrency(data.balance, config, { withName: true })}**`, inline: true },
+                { name: '🏦 Banco', value: `**${economyManager.formatCurrency(data.bank, config, { withName: true })}**`, inline: true },
+                { name: '💰 Total', value: `**${economyManager.formatCurrency(total, config, { withName: true })}**`, inline: true },
             )
             .setThumbnail(target.displayAvatarURL())
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

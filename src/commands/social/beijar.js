@@ -1,10 +1,10 @@
 // src/commands/social/beijar.js
 // ============================================================
-//   Olympus Community Bot — Comando /beijar (com GIF e retribuir)
+//   Tengoku Community Bot — Comando /beijar (com GIF e retribuir)
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const marriageManager = require('@utils/managers/marriageManager');
 
 const MESSAGES = [
@@ -48,7 +48,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.accent)
             .setDescription(message)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         if (gifUrl) embed.setImage(gifUrl);

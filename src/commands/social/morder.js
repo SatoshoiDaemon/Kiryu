@@ -1,7 +1,7 @@
 // src/commands/social/morder.js
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { fetchWaifuImage } = require('@utils/helpers/embedHelper');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const marriageManager = require('@utils/managers/marriageManager');
 
 module.exports = {
@@ -28,7 +28,7 @@ module.exports = {
             .setColor(PALETTE.accent)
             .setDescription(`🧛 **${interaction.user.username}** mordeu **${target.username}**!${extraMsg}`)
             .setImage(gifUrl)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const row = new ActionRowBuilder().addComponents(

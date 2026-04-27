@@ -1,6 +1,6 @@
 // src/events/guild/aiHandler.js
 // ============================================================
-//   Olympus Community Bot — Handler de IA (Gemini)
+//   Tengoku Community Bot — Handler de IA (Gemini)
 // ============================================================
 
 const { EmbedBuilder } = require('discord.js');

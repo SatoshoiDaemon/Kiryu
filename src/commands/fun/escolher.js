@@ -1,6 +1,6 @@
 // src/commands/fun/escolher.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -36,7 +36,7 @@ module.exports = {
             .setTitle('🎲 O Destino Escolheu!')
             .setDescription(`Eu analisei **${choices.length}** opções e a minha escolha é:\n\n🎉 **>> ${winner} <<** 🎉`)
             .addFields({ name: 'Opções oferecidas:', value: `\`${choices.join('` | `')}\`` })
-            .setFooter(olympusFooter(`Sorteio solicitado por ${interaction.user.username}`))
+            .setFooter(tengokuFooter(`Sorteio solicitado por ${interaction.user.username}`))
             .setTimestamp();
 
         await interaction.reply({ embeds: [embed] });

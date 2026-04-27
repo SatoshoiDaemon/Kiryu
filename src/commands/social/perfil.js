@@ -1,12 +1,12 @@
 // src/commands/social/perfil.js
 // ============================================================
-//   Olympus Community Bot — Perfil Social Customizável
+//   Tengoku Community Bot — Perfil Social Customizável
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, ModalBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } = require('discord.js');
 const UserData = require('@models/UserData');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 
 module.exports = {
@@ -46,7 +46,7 @@ module.exports = {
                     { name: '📨 Invites', value: `${stats.invites || 0}`, inline: true },
                 )
                 .setThumbnail(profile.thumbnail || target.displayAvatarURL())
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             if (profile.image) embed.setImage(profile.image);

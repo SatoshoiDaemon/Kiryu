@@ -1,11 +1,11 @@
 // src/commands/economy/coinflip.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('coinflip')
+        .setName('cara-coroa')
         .setDescription('💰 Jogue cara ou coroa apostando moedas.')
         .addStringOption(option => 
             option.setName('escolha')
@@ -37,7 +37,7 @@ module.exports = {
         const userData = await economyManager.getUser(user.id, guildId);
 
         if (userData.balance < amount) {
-            return interaction.reply({ content: `❌ Você não tem moedas suficientes na carteira. Saldo atual: **${userData.balance} ${config.currencySymbol}**`, flags: 64 });
+            return interaction.reply({ content: `❌ Você não tem moedas suficientes na carteira. Saldo atual: **${economyManager.formatCurrency(userData.balance, config)}**`, flags: 64 });
         }
 
         // Gira a moeda
@@ -49,8 +49,8 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.success)
                 .setTitle('🪙 Cara ou Coroa')
-                .setDescription(`A moeda caiu em **${result.toUpperCase()}**!\n\nVocê ganhou **${amount} ${config.currencySymbol}**! 🎉`)
-                .setFooter(olympusFooter())
+                .setDescription(`A moeda caiu em **${result.toUpperCase()}**!\n\nVocê ganhou **${economyManager.formatCurrency(amount, config)}**! 🎉`)
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             return interaction.reply({ embeds: [embed] });
         } else {
@@ -58,8 +58,8 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.error)
                 .setTitle('🪙 Cara ou Coroa')
-                .setDescription(`A moeda caiu em **${result.toUpperCase()}**.\n\nVocê perdeu **${amount} ${config.currencySymbol}**. 😔`)
-                .setFooter(olympusFooter())
+                .setDescription(`A moeda caiu em **${result.toUpperCase()}**.\n\nVocê perdeu **${economyManager.formatCurrency(amount, config)}**. 😔`)
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             return interaction.reply({ embeds: [embed] });
         }

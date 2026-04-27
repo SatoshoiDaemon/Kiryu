@@ -1,11 +1,11 @@
 // src/commands/utility/botinfo.js
 const { SlashCommandBuilder, EmbedBuilder, version: djsVersion } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const os = require('os');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('botinfo')
+        .setName('bot')
         .setDescription('🤖 Exibe informações técnicas e estatísticas do bot.'),
 
     async execute(interaction) {
@@ -22,7 +22,7 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setColor(PALETTE.accent)
-            .setTitle('🤖 Informações do Olympus')
+            .setTitle('🤖 Informações do Tengoku')
             .setThumbnail(client.user.displayAvatarURL({ size: 1024 }))
             .addFields(
                 { name: '📊 Servidores', value: `${client.guilds.cache.size}`, inline: true },
@@ -32,7 +32,7 @@ module.exports = {
                 { name: '⏱️ Tempo Online', value: `${days}d ${hours}h ${minutes}m`, inline: true },
                 { name: '⚙️ Engine', value: `Node.js ${process.version}\nDiscord.js v${djsVersion}`, inline: true }
             )
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

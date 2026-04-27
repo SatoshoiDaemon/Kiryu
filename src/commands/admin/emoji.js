@@ -1,10 +1,10 @@
 // src/commands/admin/emoji.js
 // ============================================================
-//   Olympus Community Bot — Gerenciamento de Emojis
+//   Tengoku Community Bot — Gerenciamento de Emojis
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -45,7 +45,7 @@ module.exports = {
                     .setTitle('😀 Emoji Adicionado')
                     .setDescription(`Emoji ${emoji} foi adicionado com sucesso!\n\n**Código:** \`<:${emoji.name}:${emoji.id}>\``)
                     .setThumbnail(emoji.url)
-                    .setFooter(olympusFooter())
+                    .setFooter(tengokuFooter())
                     .setTimestamp();
 
                 return interaction.editReply({ embeds: [embed] });
@@ -90,7 +90,7 @@ module.exports = {
                     { name: '🔗 Link', value: `[Clique aqui para baixar](${emoji.url})`, inline: false }
                 )
                 .setThumbnail(emoji.url)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             return interaction.reply({ embeds: [embed] });

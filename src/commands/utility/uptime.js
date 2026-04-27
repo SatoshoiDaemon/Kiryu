@@ -1,10 +1,10 @@
 // src/commands/utility/uptime.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('uptime')
+        .setName('atividade')
         .setDescription('⏱️ Mostra há quanto tempo o bot está online.'),
 
     async execute(interaction) {
@@ -24,7 +24,7 @@ module.exports = {
             .setColor(PALETTE.accent)
             .setTitle('⏱️ Uptime do Bot')
             .setDescription(`Estou online e operando sem interrupções há:\n**${uptimeString}**`)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

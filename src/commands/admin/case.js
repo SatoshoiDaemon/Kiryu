@@ -1,12 +1,12 @@
 // src/commands/admin/case.js
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const ModLog = require('@models/ModLog');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const permissionsManager = require('@utils/managers/permissionsManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('case')
+        .setName('caso')
         .setDescription('🔍 Visualiza detalhes específicos de um caso de moderação (Case ID).')
         .addIntegerOption(o => o.setName('numero').setDescription('Número do Caso').setRequired(true))
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
@@ -63,7 +63,7 @@ module.exports = {
                 { name: 'Motivo Registrado', value: `> ${log.reason || 'Nenhum motivo fornecido no momento da infração.'}`, inline: false },
                 { name: 'Data da Infração', value: `<t:${Math.floor(log.createdAt.getTime() / 1000)}:F>`, inline: false },
             )
-            .setFooter(olympusFooter(`ID do Caso no Servidor: ${log.caseId}`))
+            .setFooter(tengokuFooter(`ID do Caso no Servidor: ${log.caseId}`))
             .setTimestamp(log.createdAt);
 
         if (targetUser) embed.setThumbnail(targetUser.displayAvatarURL());

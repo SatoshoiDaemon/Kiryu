@@ -24,12 +24,12 @@ async function runAffinityDegradation(client) {
             if (oldAffinity >= 20 && newAffinity < 20) {
                 try {
                     const u1 = await client.users.fetch(m.user1Id);
-                    if (u1) await u1.send(`⚠️ **Aviso do Olympus:** Seu casamento com <@${m.user2Id}> está esfriando! A afinidade caiu para **${newAffinity}%**. Interajam mais usando os comandos sociais!`).catch(() => null);
+                    if (u1) await u1.send(`⚠️ **Aviso do Tengoku:** Seu casamento com <@${m.user2Id}> está esfriando! A afinidade caiu para **${newAffinity}%**. Interajam mais usando os comandos sociais!`).catch(() => null);
                 } catch { /* ignora dm fechada */ }
                 
                 try {
                     const u2 = await client.users.fetch(m.user2Id);
-                    if (u2) await u2.send(`⚠️ **Aviso do Olympus:** Seu casamento com <@${m.user1Id}> está esfriando! A afinidade caiu para **${newAffinity}%**. Interajam mais usando os comandos sociais!`).catch(() => null);
+                    if (u2) await u2.send(`⚠️ **Aviso do Tengoku:** Seu casamento com <@${m.user1Id}> está esfriando! A afinidade caiu para **${newAffinity}%**. Interajam mais usando os comandos sociais!`).catch(() => null);
                 } catch { /* ignora dm fechada */ }
             }
         }

@@ -1,14 +1,14 @@
 // src/commands/admin/role.js
 // ============================================================
-//   Olympus Community Bot — Gerenciamento de Cargos
+//   Tengoku Community Bot — Gerenciamento de Cargos
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('role')
+        .setName('cargo')
         .setDescription('🛡️ Gerencia e visualiza informações de cargos do servidor.')
         .setDefaultMemberPermissions(PermissionFlagsBits.ManageRoles)
         .addSubcommand(sub => sub.setName('add').setDescription('➕ Adiciona ou remove um cargo de um membro')
@@ -51,7 +51,7 @@ module.exports = {
                     .setColor(wasAdded ? PALETTE.success : PALETTE.error)
                     .setTitle('🛡️ Gerenciamento de Cargos')
                     .setDescription(`O cargo ${role} foi **${wasAdded ? 'adicionado a' : 'removido de'}** ${memberOption}.`)
-                    .setFooter(olympusFooter())
+                    .setFooter(tengokuFooter())
                     .setTimestamp();
 
                 return interaction.reply({ embeds: [embed] });
@@ -86,7 +86,7 @@ module.exports = {
                     { name: '📅 Criado em', value: `<t:${Math.floor(role.createdTimestamp / 1000)}:F>`, inline: false },
                     { name: '🔑 Permissões Chave', value: permsText || '`Nenhuma`', inline: false },
                 )
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             if (role.icon) {

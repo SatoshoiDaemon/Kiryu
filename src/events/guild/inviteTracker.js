@@ -1,6 +1,6 @@
 // src/events/guild/inviteTracker.js
 // ============================================================
-//   Olympus Community Bot — Rastreamento de Invites
+//   Tengoku Community Bot — Rastreamento de Invites
 // ============================================================
 
 const UserData = require('@models/UserData');

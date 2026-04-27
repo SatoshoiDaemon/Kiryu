@@ -1,10 +1,10 @@
 // src/commands/utility/serverinfo.js
 const { SlashCommandBuilder, EmbedBuilder, ChannelType } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('serverinfo')
+        .setName('servidor')
         .setDescription('🏘️ Exibe informações sobre o servidor atual.'),
 
     async execute(interaction) {
@@ -36,7 +36,7 @@ module.exports = {
                 { name: '🚀 Boosts', value: `Nível ${boostLevel} (${boostCount} boosts)`, inline: true },
                 { name: '🆔 ID do Servidor', value: `\`${guild.id}\``, inline: true }
             )
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

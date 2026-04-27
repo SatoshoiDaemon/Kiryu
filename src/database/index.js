@@ -1,6 +1,6 @@
 // src/database/index.js
 // ============================================================
-//   Olympus Community Bot — Módulo de Banco de Dados
+//   Tengoku Community Bot — Módulo de Banco de Dados
 //   Utiliza Mongoose (MongoDB) para alta escalabilidade
 // ============================================================
 

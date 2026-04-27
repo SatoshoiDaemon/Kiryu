@@ -1,7 +1,7 @@
 // src/commands/utility/afk.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const UserData = require('@models/UserData');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,7 +27,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.primary)
             .setDescription(`💤 ${interaction.user.toString()} setou seu status como **AFK**: \`${reason}\``)
-            .setFooter(olympusFooter('Qualquer mensagem sua removerá o AFK'))
+            .setFooter(tengokuFooter('Qualquer mensagem sua removerá o AFK'))
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

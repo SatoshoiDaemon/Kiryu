@@ -1,6 +1,6 @@
 // src/commands/utility/banner.js
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -22,7 +22,7 @@ module.exports = {
                 .setColor(PALETTE.accent)
                 .setTitle(`Banner de ${target.username}`)
                 .setDescription(`Este usuário não possui uma imagem de banner.\nCor de destaque: **${hexColor}**`)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             return interaction.reply({ embeds: [embed] });
         }
@@ -31,7 +31,7 @@ module.exports = {
             .setColor(PALETTE.accent)
             .setTitle(`Banner de ${target.username}`)
             .setImage(bannerUrl)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const row = new ActionRowBuilder().addComponents(

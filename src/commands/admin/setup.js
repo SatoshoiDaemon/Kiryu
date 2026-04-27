@@ -1,11 +1,11 @@
 // src/commands/admin/setup.js
 // ============================================================
-//   Olympus Community Bot — Configuração de Verificação
+//   Tengoku Community Bot — Configuração de Verificação
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 
 module.exports = {
@@ -99,7 +99,7 @@ module.exports = {
                     .setTitle(config.embed.title)
                     .setDescription(config.embed.description)
                     .setColor(config.embed.color || branding.accent || PALETTE.accent)
-                    .setFooter(olympusFooter())
+                    .setFooter(tengokuFooter())
                     .setTimestamp();
 
                 if (config.embed.image) embed.setImage(config.embed.image);

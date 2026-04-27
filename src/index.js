@@ -8,7 +8,7 @@
 //   ╚██████╔╝███████╗██║   ██║ ╚═╝ ██║██║     ╚██████╔╝███████║
 //    ╚═════╝ ╚══════╝╚═╝   ╚═╝     ╚═╝╚═╝      ╚═════╝ ╚══════╝
 //
-//   Community Bot v2.0 — Desenvolvido pela Olympus Studio
+//   Community Bot v2.0 — Desenvolvido pela Tengoku
 // ============================================================
 
 // ── Registro dos aliases de módulo (deve ser a primeira instrução) ──
@@ -48,8 +48,8 @@ const client = new Client({
 // ── Inicialização ─────────────────────────────────────────────
 async function start() {
     try {
-        logger.info('🚀 Iniciando Olympus Community Bot v2.0...');
-        logger.info('💜 Desenvolvido pela Olympus Studio');
+        logger.info('🚀 Iniciando Tengoku Community Bot v2.0...');
+        logger.info('💜 Desenvolvido pela Tengoku');
 
         // Inicializa o banco de dados
         await initializeDatabase();

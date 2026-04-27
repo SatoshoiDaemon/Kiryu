@@ -1,6 +1,6 @@
 // src/commands/admin/ban.js
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const permissionsManager = require('@utils/managers/permissionsManager');
 const { registerModLog, sendModLogChannel } = require('@utils/helpers/modHelper');
 
@@ -61,7 +61,7 @@ module.exports = {
                 { name: 'Mensagens deletadas', value: `${days} dia(s)`, inline: true },
             )
             .setThumbnail(target.displayAvatarURL())
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

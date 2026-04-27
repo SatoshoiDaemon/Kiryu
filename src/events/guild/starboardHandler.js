@@ -1,12 +1,12 @@
 // src/events/guild/starboardHandler.js
 // ============================================================
-//   Olympus Community Bot — Handler de Starboard
+//   Tengoku Community Bot — Handler de Starboard
 //   Envia mensagens populares para o canal de starboard
 // ============================================================
 
 const { EmbedBuilder } = require('discord.js');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const logger = require('@utils/logger');
 
 // Cache de mensagens já enviadas ao starboard (messageId -> starboardMessageId)
@@ -73,7 +73,7 @@ module.exports = {
                 { name: 'Canal', value: `<#${message.channel.id}>`, inline: true },
                 { name: 'Link', value: `[Ir para a mensagem](${message.url})`, inline: true },
             )
-            .setFooter(olympusFooter(`${starEmoji} ${starCount}`))
+            .setFooter(tengokuFooter(`${starEmoji} ${starCount}`))
             .setTimestamp(message.createdAt);
 
         // Adiciona imagem se houver

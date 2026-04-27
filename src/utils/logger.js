@@ -1,6 +1,6 @@
 // src/utils/logger.js
 // ============================================================
-//   Olympus Community Bot — Sistema de Logs
+//   Tengoku Community Bot — Sistema de Logs
 // ============================================================
 
 const fs = require('fs');
@@ -9,7 +9,7 @@ const axios = require('axios');
 require('dotenv').config();
 
 const LOG_DIR  = path.join(__dirname, '../../logs');
-const LOG_FILE = path.join(LOG_DIR, 'olympus.log');
+const LOG_FILE = path.join(LOG_DIR, 'tengoku.log');
 
 if (!fs.existsSync(LOG_DIR)) {
     fs.mkdirSync(LOG_DIR, { recursive: true });
@@ -65,7 +65,7 @@ async function processQueue() {
                     title: `📋 ${level}`,
                     description: `\`\`\`${message}\`\`\``,
                     color: DISCORD_COLORS[level] || DISCORD_COLORS.INFO,
-                    footer: { text: 'Olympus Bot — Sistema de Logs' },
+                    footer: { text: 'Tengoku Bot — Sistema de Logs' },
                     timestamp: new Date().toISOString(),
                 }]
             });

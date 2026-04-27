@@ -1,12 +1,12 @@
 // src/utils/managers/brandingManager.js
 // ============================================================
-//   Olympus Community Bot — Gerenciador de Branding por Servidor
+//   Tengoku Community Bot — Gerenciador de Branding por Servidor
 // ============================================================
 
 const Guild = require('@models/Guild');
 
 const DEFAULTS = {
-    botName:     'Olympus Bot',
+    botName:     'Tengoku Bot',
     botAvatar:   null,
     embedColor:  '#1a1a2e',
     accentColor: '#7b2fff',

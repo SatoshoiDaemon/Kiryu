@@ -1,16 +1,16 @@
 // src/commands/economy/coletar.js
 // ============================================================
-//   Olympus Community Bot — Coletar Ganhos do Mines
+//   Tengoku Community Bot — Coletar Ganhos do Campo Minado
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('coletar')
-        .setDescription('💰 Colete seus ganhos no Mines antes de explodir!'),
+        .setDescription('💰 Colete seus ganhos no campo minado antes de explodir.'),
 
     async execute(interaction) {
         const minesModule = require('@commands/fun/mines');
@@ -19,7 +19,7 @@ module.exports = {
         const game = games.get(userId);
 
         if (!game) {
-            return interaction.reply({ content: '❌ Você não tem uma partida de Mines ativa.', flags: 64 });
+            return interaction.reply({ content: '❌ Você não tem uma partida de campo minado ativa.', flags: 64 });
         }
 
         if (game.revealed.size === 0) {
@@ -35,8 +35,8 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.success)
             .setTitle('💰 Ganhos Coletados!')
-            .setDescription(`Multiplicador: **${game.multiplier}x**\nVocê coletou **${winnings} ${config.currencySymbol}**!`)
-            .setFooter(olympusFooter())
+            .setDescription(`Multiplicador: **${game.multiplier}x**\nVocê coletou **${economyManager.formatCurrency(winnings, config)}**!`)
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const grid = buildGrid(game, true);

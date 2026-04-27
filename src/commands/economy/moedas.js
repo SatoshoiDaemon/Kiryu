@@ -2,7 +2,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
 const permissionsManager = require('@utils/managers/permissionsManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -36,8 +36,8 @@ module.exports = {
             return interaction.reply({ embeds: [
                 new EmbedBuilder().setColor(PALETTE.success)
                     .setTitle('✅ Moedas Adicionadas')
-                    .setDescription(`**+${valor} ${config.currencySymbol}** adicionado(s) à carteira de ${target}.`)
-                    .setFooter(olympusFooter()).setTimestamp()
+                    .setDescription(`**+${economyManager.formatCurrency(valor, config)}** adicionado(s) à carteira de ${target}.`)
+                    .setFooter(tengokuFooter()).setTimestamp()
             ], flags: 64 });
         }
 
@@ -46,8 +46,8 @@ module.exports = {
             return interaction.reply({ embeds: [
                 new EmbedBuilder().setColor(PALETTE.warning)
                     .setTitle('✅ Moedas Removidas')
-                    .setDescription(`**-${valor} ${config.currencySymbol}** removido(s) da carteira de ${target}.`)
-                    .setFooter(olympusFooter()).setTimestamp()
+                    .setDescription(`**-${economyManager.formatCurrency(valor, config)}** removido(s) da carteira de ${target}.`)
+                    .setFooter(tengokuFooter()).setTimestamp()
             ], flags: 64 });
         }
 
@@ -56,8 +56,8 @@ module.exports = {
             return interaction.reply({ embeds: [
                 new EmbedBuilder().setColor(PALETTE.info)
                     .setTitle('✅ Saldo Definido')
-                    .setDescription(`Saldo de ${target} definido para **${valor} ${config.currencySymbol}**.`)
-                    .setFooter(olympusFooter()).setTimestamp()
+                    .setDescription(`Saldo de ${target} definido para **${economyManager.formatCurrency(valor, config)}**.`)
+                    .setFooter(tengokuFooter()).setTimestamp()
             ], flags: 64 });
         }
     },

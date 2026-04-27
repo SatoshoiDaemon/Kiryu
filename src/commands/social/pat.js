@@ -1,6 +1,6 @@
 // src/commands/social/pat.js
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { fetchWaifuImage, PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { fetchWaifuImage, PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const marriageManager = require('@utils/managers/marriageManager');
 
 const MESSAGES = [
@@ -41,7 +41,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.accent)
             .setDescription(message)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
         if (gifUrl) embed.setImage(gifUrl);
 

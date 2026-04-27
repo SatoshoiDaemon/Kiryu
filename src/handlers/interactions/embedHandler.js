@@ -1,6 +1,6 @@
 // src/handlers/interactions/embedHandler.js
 // ============================================================
-//   Olympus Community Bot — Handler do Construtor de Embeds
+//   Tengoku Community Bot — Handler do Construtor de Embeds
 // ============================================================
 
 const {
@@ -14,7 +14,7 @@ const {
     ChannelSelectMenuBuilder,
     ChannelType
 } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 const logger = require('@utils/logger');
 
@@ -172,7 +172,7 @@ async function handleEmbedButton(interaction) {
                 new TextInputBuilder().setCustomId('webhook_url').setLabel('URL do Webhook (obrigatório)').setStyle(TextInputStyle.Short).setRequired(true).setPlaceholder('https://discord.com/api/webhooks/...')
             ),
             new ActionRowBuilder().addComponents(
-                new TextInputBuilder().setCustomId('webhook_name').setLabel('Nome Sobrescrito do Webhook').setStyle(TextInputStyle.Short).setRequired(false).setPlaceholder('Olympus Avisos')
+                new TextInputBuilder().setCustomId('webhook_name').setLabel('Nome Sobrescrito do Webhook').setStyle(TextInputStyle.Short).setRequired(false).setPlaceholder('Tengoku Avisos')
             ),
             new ActionRowBuilder().addComponents(
                 new TextInputBuilder().setCustomId('webhook_avatar').setLabel('URL do Avatar do Webhook').setStyle(TextInputStyle.Short).setRequired(false).setPlaceholder('https://i.imgur.com/...')

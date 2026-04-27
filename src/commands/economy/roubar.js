@@ -1,7 +1,7 @@
 // src/commands/economy/roubar.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 const cooldowns = new Map();
 
@@ -66,8 +66,8 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.success)
                 .setTitle('🔫 Roubo Bem-Sucedido!')
-                .setDescription(`Você roubou **${stolenAmount} ${config.currencySymbol}** da carteira de ${target}!`)
-                .setFooter(olympusFooter())
+                .setDescription(`Você roubou **${economyManager.formatCurrency(stolenAmount, config)}** da carteira de ${target}!`)
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             
             return interaction.reply({ embeds: [embed] });
@@ -82,8 +82,8 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.error)
                 .setTitle('🚨 Você foi pego!')
-                .setDescription(`Sua tentativa de roubar ${target} falhou, você foi pego pela polícia e pagou uma multa de **${fine} ${config.currencySymbol}**.`)
-                .setFooter(olympusFooter())
+                .setDescription(`Sua tentativa de roubar ${target} falhou, você foi pego pela polícia e pagou uma multa de **${economyManager.formatCurrency(fine, config)}**.`)
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             
             return interaction.reply({ embeds: [embed] });

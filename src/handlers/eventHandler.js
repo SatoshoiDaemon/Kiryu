@@ -1,6 +1,6 @@
 // src/handlers/eventHandler.js
 // ============================================================
-//   Olympus Community Bot — Carregador de Eventos
+//   Tengoku Community Bot — Carregador de Eventos
 // ============================================================
 
 const fs   = require('fs');

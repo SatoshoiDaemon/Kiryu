@@ -1,6 +1,6 @@
 // src/events/interaction/configHandler.js
 // ============================================================
-//   Olympus Community Bot — Handler Central do /config
+//   Tengoku Community Bot — Handler Central do /config
 //   Gerencia todos os menus, botões e modais do painel
 // ============================================================
 
@@ -20,9 +20,10 @@ const {
 } = require('discord.js');
 const Guild = require('@models/Guild');
 const XPRole = require('@models/XPRole');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 const permissionsManager = require('@utils/managers/permissionsManager');
+const economyManager = require('@utils/managers/economyManager');
 const logger = require('@utils/logger');
 
 // ── Botão de voltar ao menu principal ────────────────────────
@@ -75,7 +76,7 @@ async function showMain(interaction) {
         .setColor(branding.accent || PALETTE.accent)
         .setTitle('⚙️ Painel de Configuração')
         .setDescription(
-            '> Bem-vindo ao painel de configuração do **Olympus Bot**.\n' +
+            '> Bem-vindo ao painel de configuração do **Tengoku Bot**.\n' +
             '> Selecione uma categoria abaixo para configurar as funcionalidades do bot neste servidor.\n\n' +
             '**Categorias disponíveis:**\n' +
             '🤖 **IA** — Configurar o assistente de inteligência artificial\n' +
@@ -87,7 +88,7 @@ async function showMain(interaction) {
             '🚀 **Sistemas** — Sugestões, parcerias, starboard e instafeed\n' +
             '🎨 **Aparência** — Cores, nome e identidade visual do bot'
         )
-        .setFooter(olympusFooter('Use os menus abaixo para navegar'))
+        .setFooter(tengokuFooter('Use os menus abaixo para navegar'))
         .setTimestamp();
 
     const select = new StringSelectMenuBuilder()
@@ -130,7 +131,7 @@ async function showAI(interaction) {
             { name: 'Chave API', value: cfg.apiKey ? '`••••••••` (configurada)' : '`Não configurada`', inline: true },
             { name: 'Instrução do Sistema', value: cfg.systemInstruction ? `\`\`\`${cfg.systemInstruction.substring(0, 100)}...\`\`\`` : '`Padrão`', inline: false },
         )
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     const row1 = new ActionRowBuilder().addComponents(
@@ -176,7 +177,7 @@ async function showWelcome(interaction) {
             { name: 'Cargos Iniciais', value: rolesText, inline: false },
             { name: 'Mensagem no Canal', value: cfg.welcomeMsgChannel ? `\`\`\`${cfg.welcomeMsgChannel.substring(0, 150)}\`\`\`` : '`Padrão`', inline: false },
         )
-        .setFooter(olympusFooter('Use {user} para mencionar, {server} para o nome do servidor'))
+        .setFooter(tengokuFooter('Use {user} para mencionar, {server} para o nome do servidor'))
         .setTimestamp();
 
     const row1 = new ActionRowBuilder().addComponents(
@@ -212,7 +213,7 @@ async function showEconomy(interaction) {
         dailyAmount: 100, workMin: 50, workMax: 200,
         workCooldown: 3600, robEnabled: true,
     };
-    const cfg = guildDoc?.economyConfig || defaults;
+    const cfg = economyManager.normalizeConfig(guildDoc?.economyConfig || defaults);
     const color = await guildColor(interaction.guildId);
 
     const embed = new EmbedBuilder()
@@ -222,11 +223,11 @@ async function showEconomy(interaction) {
         .addFields(
             { name: 'Status', value: cfg.enabled ? '✅ Ativado' : '❌ Desativado', inline: true },
             { name: 'Moeda', value: `${cfg.currencySymbol} ${cfg.currencyName}`, inline: true },
-            { name: 'Daily', value: `${cfg.dailyAmount} ${cfg.currencySymbol}`, inline: true },
-            { name: 'Trabalho', value: `${cfg.workMin}–${cfg.workMax} ${cfg.currencySymbol} (CD: ${Math.floor(cfg.workCooldown / 60)}min)`, inline: true },
+            { name: 'Daily', value: economyManager.formatCurrency(cfg.dailyAmount, cfg), inline: true },
+            { name: 'Trabalho', value: `${economyManager.formatCurrency(cfg.workMin, cfg)}–${economyManager.formatCurrency(cfg.workMax, cfg)} (CD: ${Math.floor(cfg.workCooldown / 60)}min)`, inline: true },
             { name: 'Roubo', value: cfg.robEnabled ? '✅ Ativado' : '❌ Desativado', inline: true },
         )
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     const row1 = new ActionRowBuilder().addComponents(
@@ -273,13 +274,13 @@ async function showXP(interaction) {
             { name: 'Canal de Notificação', value: cfg.notificationChannel ? `<#${cfg.notificationChannel}>` : '`Mesmo canal`', inline: true },
             { name: 'Cargos por Nível', value: rolesText, inline: false },
         )
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('cfg:xp:toggle').setLabel(cfg.enabled ? 'Desativar XP' : 'Ativar XP').setStyle(cfg.enabled ? ButtonStyle.Danger : ButtonStyle.Success),
         new ButtonBuilder().setCustomId('cfg:xp:set_rates').setLabel('Taxas de XP').setStyle(ButtonStyle.Primary),
-        new ButtonBuilder().setCustomId('cfg:xp:set_message').setLabel('Mensagem de Level Up').setStyle(ButtonStyle.Secondary),
+        new ButtonBuilder().setCustomId('cfg:xp:set_message').setLabel('Mensagem de Subida').setStyle(ButtonStyle.Secondary),
     );
     const row2 = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('cfg:xp:add_role').setLabel('Adicionar Cargo de Nível').setStyle(ButtonStyle.Secondary),
@@ -326,7 +327,7 @@ async function showSystems(interaction) {
             { name: '🛡️ Anti-Fake', value: antiFake.enabled ? `✅ (${antiFake.action || 'kick'})` : '❌ Desativado', inline: true },
             { name: '👤 Perfil', value: `Bio: ${profileCfg.maxBioLength || 150} chars`, inline: true },
         )
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     const row1 = new ActionRowBuilder().addComponents(
@@ -362,7 +363,7 @@ async function showBranding(interaction) {
             { name: 'Cor de Destaque', value: `\`${branding.accent}\``, inline: true },
             { name: 'Avatar Personalizado', value: branding.avatar ? `[Ver imagem](${branding.avatar})` : '`Padrão do Discord`', inline: true },
         )
-        .setFooter(olympusFooter('As cores devem estar em formato hexadecimal (#RRGGBB)'))
+        .setFooter(tengokuFooter('As cores devem estar em formato hexadecimal (#RRGGBB)'))
         .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
@@ -390,7 +391,7 @@ async function showPerms(interaction) {
             '**Comandos com permissões configuradas:**\n' +
             (commands.length ? commands.map(c => `• \`/${c}\``).join('\n') : '`Nenhum — todos os comandos usam permissões padrão do Discord`')
         )
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
@@ -628,7 +629,7 @@ async function handleButton(interaction) {
         ]);
     }
     if (id === 'cfg:xp:set_channel') {
-        return showModal(interaction, 'modal:xp:channel', 'Canal de Notificação de Level Up', [
+        return showModal(interaction, 'modal:xp:channel', 'Canal de Notificação de Nível', [
             { id: 'xp_channel', label: 'ID do Canal (vazio = mesmo canal)', placeholder: '123456789012345678', style: TextInputStyle.Short, required: false },
         ]);
     }
@@ -644,7 +645,7 @@ async function handleButton(interaction) {
         ]);
     }
     if (id === 'cfg:xp:set_message') {
-        return showModal(interaction, 'modal:xp:message', 'Mensagem de Level Up', [
+        return showModal(interaction, 'modal:xp:message', 'Mensagem de Subida de Nível', [
             { id: 'xp_levelup_msg', label: 'Mensagem (use {user} e {level})', placeholder: 'Parabéns {user}, você subiu para o nível **{level}**!', style: TextInputStyle.Paragraph },
         ]);
     }
@@ -708,7 +709,7 @@ async function handleButton(interaction) {
     // ── Branding ──────────────────────────────────────────────
     if (id === 'cfg:branding:set_name') {
         return showModal(interaction, 'modal:branding:name', 'Alterar Nome do Bot', [
-            { id: 'bot_name', label: 'Nome do Bot', placeholder: 'Olympus Bot', style: TextInputStyle.Short },
+            { id: 'bot_name', label: 'Nome do Bot', placeholder: 'Tengoku Bot', style: TextInputStyle.Short },
         ]);
     }
     if (id === 'cfg:branding:set_colors') {
@@ -794,25 +795,27 @@ async function handleModal(interaction) {
 
         // ── Economia ──────────────────────────────────────────
         if (customId === 'modal:economy:currency') {
-            const name = fields.getTextInputValue('currency_name');
-            const symbol = fields.getTextInputValue('currency_symbol');
+            const name = fields.getTextInputValue('currency_name').trim() || 'moedas';
+            const symbol = fields.getTextInputValue('currency_symbol').trim() || '🪙';
             await upsertConfig(guildId, 'economyConfig', { currencyName: name, currencySymbol: symbol });
             return interaction.reply({ content: `✅ Moeda configurada: ${symbol} ${name}.`, flags: 64 });
         }
         if (customId === 'modal:economy:daily') {
             const amount = parseInt(fields.getTextInputValue('daily_amount'));
             const cooldown = parseInt(fields.getTextInputValue('daily_cooldown'));
-            if (isNaN(amount) || isNaN(cooldown)) return interaction.reply({ content: '❌ Valores inválidos. Use apenas números.', flags: 64 });
+            if (!Number.isInteger(amount) || amount < 0 || !Number.isInteger(cooldown) || cooldown < 0) return interaction.reply({ content: '❌ Valores inválidos. Use números inteiros positivos.', flags: 64 });
+            const config = await economyManager.getConfig(guildId);
             await upsertConfig(guildId, 'economyConfig', { dailyAmount: amount, dailyCooldown: cooldown });
-            return interaction.reply({ content: `✅ Daily configurado: ${amount} moedas, cooldown de ${cooldown}s.`, flags: 64 });
+            return interaction.reply({ content: `✅ Daily configurado: ${economyManager.formatCurrency(amount, config)}, cooldown de ${cooldown}s.`, flags: 64 });
         }
         if (customId === 'modal:economy:work') {
             const min = parseInt(fields.getTextInputValue('work_min'));
             const max = parseInt(fields.getTextInputValue('work_max'));
             const cooldown = parseInt(fields.getTextInputValue('work_cooldown'));
-            if (isNaN(min) || isNaN(max) || isNaN(cooldown)) return interaction.reply({ content: '❌ Valores inválidos. Use apenas números.', flags: 64 });
+            if (!Number.isInteger(min) || !Number.isInteger(max) || min < 0 || max < min || !Number.isInteger(cooldown) || cooldown < 0) return interaction.reply({ content: '❌ Valores inválidos. Use inteiros positivos e mantenha o máximo maior ou igual ao mínimo.', flags: 64 });
+            const config = await economyManager.getConfig(guildId);
             await upsertConfig(guildId, 'economyConfig', { workMin: min, workMax: max, workCooldown: cooldown });
-            return interaction.reply({ content: `✅ Trabalho configurado: ${min}–${max} moedas, cooldown de ${cooldown}s.`, flags: 64 });
+            return interaction.reply({ content: `✅ Trabalho configurado: ${economyManager.formatCurrency(min, config)}–${economyManager.formatCurrency(max, config)}, cooldown de ${cooldown}s.`, flags: 64 });
         }
         if (customId === 'modal:eco:shop_add') {
             const { ShopProduct } = require('@models/Shop');
@@ -847,7 +850,9 @@ async function handleModal(interaction) {
             const max = parseInt(fields.getTextInputValue('xp_max'));
             const voice = parseInt(fields.getTextInputValue('xp_voice'));
             const cooldown = parseInt(fields.getTextInputValue('xp_cooldown'));
-            if ([min, max, voice, cooldown].some(isNaN)) return interaction.reply({ content: '❌ Valores inválidos. Use apenas números.', flags: 64 });
+            if (![min, max, voice, cooldown].every(Number.isInteger) || min < 0 || max < min || voice < 0 || cooldown < 0) {
+                return interaction.reply({ content: '❌ Valores inválidos. Use inteiros positivos e mantenha o XP máximo maior ou igual ao mínimo.', flags: 64 });
+            }
             await upsertConfig(guildId, 'xpConfig', { minChatXp: min, maxChatXp: max, voiceXpRate: voice, cooldownSeconds: cooldown });
             return interaction.reply({ content: `✅ Taxas de XP atualizadas: ${min}–${max} XP/msg, ${voice} XP/min em voz.`, flags: 64 });
         }
@@ -989,7 +994,7 @@ async function handleModal(interaction) {
                         ? perms.map(p => `• **${p.type}**: \`${p.targetId}\``).join('\n')
                         : '`Nenhuma permissão configurada — usa permissões padrão do Discord`'
                 )
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             return interaction.reply({ embeds: [embed], flags: 64 });
         }
@@ -1039,7 +1044,7 @@ async function showSysSuggestions(interaction) {
             { name: 'Canal', value: cfg.channelId ? `<#${cfg.channelId}>` : '`Não configurado`', inline: true },
             { name: 'Auto-Thread', value: cfg.autoThread ? '✅ Sim' : '❌ Não', inline: true }
         )
-        .setFooter(olympusFooter());
+        .setFooter(tengokuFooter());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('cfg:sys:sug_toggle').setLabel(cfg.autoThread ? 'Desativar Auto-Thread' : 'Ativar Auto-Thread').setStyle(ButtonStyle.Secondary),
@@ -1070,7 +1075,7 @@ async function showSysPartnerships(interaction) {
             { name: 'Cargo Parceiro', value: cfg.partnerRole ? `<@&${cfg.partnerRole}>` : '`Nenhum`', inline: true },
             { name: 'Cargo Staff/Manager', value: cfg.staffRole ? `<@&${cfg.staffRole}>` : '`Nenhum`', inline: true },
         )
-        .setFooter(olympusFooter());
+        .setFooter(tengokuFooter());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ChannelSelectMenuBuilder()
@@ -1112,7 +1117,7 @@ async function showSysStarboard(interaction) {
             { name: 'Mínimo de Reações', value: `${cfg.minStars || 5}`, inline: true },
             { name: 'Emoji', value: cfg.emoji || '⭐', inline: true },
         )
-        .setFooter(olympusFooter());
+        .setFooter(tengokuFooter());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('cfg:sys:star_min').setLabel('Definir Mínimo...').setStyle(ButtonStyle.Primary),
@@ -1142,7 +1147,7 @@ async function showSysInstafeed(interaction) {
             { name: 'Canal Principal', value: cfg.channelId ? `<#${cfg.channelId}>` : '`Nenhum`', inline: true },
             { name: 'Cargo Necessário', value: cfg.requiredRole ? `<@&${cfg.requiredRole}>` : '`Todos podem`', inline: true }
         )
-        .setFooter(olympusFooter());
+        .setFooter(tengokuFooter());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ChannelSelectMenuBuilder()
@@ -1183,7 +1188,7 @@ async function showSysLogs(interaction) {
             { name: 'Eventos de Voz', value: cfg.voiceChannel ? `<#${cfg.voiceChannel}>` : '`Apenas logs básicos`', inline: true },
             { name: 'Invites (Criar/Deletar)', value: cfg.inviteChannel ? `<#${cfg.inviteChannel}>` : '`Apenas logs básicos`', inline: true }
         )
-        .setFooter(olympusFooter());
+        .setFooter(tengokuFooter());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ChannelSelectMenuBuilder().setCustomId('cfg:sel:logs_delete').setPlaceholder('Canal p/ Mensagens Deletadas...').setChannelTypes(ChannelType.GuildText)
@@ -1223,7 +1228,7 @@ async function showSysAntiFake(interaction) {
             { name: 'Expulsar Não Verificados', value: cfg.kickUnverifiedBots ? '✅ Sim (apenas bots não verificados)' : '❌ Não (se ativado acima, expulsa TODOS)', inline: false },
             { name: 'Nicks Banidos', value: cfg.bannedNicknames?.length ? `\`${cfg.bannedNicknames.join(', ')}\`` : '`Nenhum configurado`', inline: false }
         )
-        .setFooter(olympusFooter('Defina os limites e palavras banidas pelo botão abaixo'));
+        .setFooter(tengokuFooter('Defina os limites e palavras banidas pelo botão abaixo'));
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('cfg:sys:antifake_toggle').setLabel(cfg.enabled ? 'Desativar Anti-Fake' : 'Ativar Anti-Fake').setStyle(cfg.enabled ? ButtonStyle.Danger : ButtonStyle.Success),
@@ -1255,7 +1260,7 @@ async function showSysPerfil(interaction) {
             { name: 'Tamanho Expandido Bio', value: `${cfg.extendedBioLength || 500} caracteres`, inline: true },
             { name: 'Cargos p/ Bio Expandida', value: extRoles.length ? extRoles.map(r => `<@&${r}>`).join(', ') : '`Nenhum cargo selecionado`', inline: false }
         )
-        .setFooter(olympusFooter('Para mudar os números de limite use slash commands / (TODO) ou banco'));
+        .setFooter(tengokuFooter('Para mudar os números de limite use slash commands / (TODO) ou banco'));
 
     const row1 = new ActionRowBuilder().addComponents(
         new RoleSelectMenuBuilder()
@@ -1290,7 +1295,7 @@ async function showShopConfig(interaction) {
                 inline: false 
             }
         )
-        .setFooter(olympusFooter());
+        .setFooter(tengokuFooter());
 
     const row1 = new ActionRowBuilder().addComponents(
         new ButtonBuilder().setCustomId('cfg:eco:shop_add').setLabel('Adicionar Item').setStyle(ButtonStyle.Success),

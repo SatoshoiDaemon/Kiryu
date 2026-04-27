@@ -1,7 +1,7 @@
 // src/commands/economy/banco.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,7 +27,7 @@ module.exports = {
 
         if (sub === 'depositar') {
             if (valor > data.balance) {
-                return interaction.reply({ content: `❌ Você não tem ${valor} ${config.currencySymbol} na carteira.`, flags: 64 });
+                return interaction.reply({ content: `❌ Você não tem ${economyManager.formatCurrency(valor, config)} na carteira.`, flags: 64 });
             }
             await economyManager.addBalance(userId, guildId, -valor);
             await economyManager.addBank(userId, guildId, valor);
@@ -35,15 +35,15 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.success)
                 .setTitle('🏦 Depósito Realizado')
-                .setDescription(`Você depositou **${valor} ${config.currencySymbol} ${config.currencyName}** no banco.`)
-                .setFooter(olympusFooter())
+                .setDescription(`Você depositou **${economyManager.formatCurrency(valor, config, { withName: true })}** no banco.`)
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             return interaction.reply({ embeds: [embed] });
         }
 
         if (sub === 'sacar') {
             if (valor > data.bank) {
-                return interaction.reply({ content: `❌ Você não tem ${valor} ${config.currencySymbol} no banco.`, flags: 64 });
+                return interaction.reply({ content: `❌ Você não tem ${economyManager.formatCurrency(valor, config)} no banco.`, flags: 64 });
             }
             await economyManager.addBank(userId, guildId, -valor);
             await economyManager.addBalance(userId, guildId, valor);
@@ -51,8 +51,8 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.success)
                 .setTitle('🏦 Saque Realizado')
-                .setDescription(`Você sacou **${valor} ${config.currencySymbol} ${config.currencyName}** do banco.`)
-                .setFooter(olympusFooter())
+                .setDescription(`Você sacou **${economyManager.formatCurrency(valor, config, { withName: true })}** do banco.`)
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             return interaction.reply({ embeds: [embed] });
         }

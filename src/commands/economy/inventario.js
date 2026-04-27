@@ -1,11 +1,11 @@
 // src/commands/economy/inventario.js
 // ============================================================
-//   Olympus Community Bot — Inventário do Usuário
+//   Tengoku Community Bot — Inventário do Usuário
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const UserData = require('@models/UserData');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -31,7 +31,7 @@ module.exports = {
                 `**${i + 1}.** ${item.productName} — x${item.quantity}`
             ).join('\n'))
             .setThumbnail(target.displayAvatarURL())
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

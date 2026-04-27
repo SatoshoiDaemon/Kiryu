@@ -1,6 +1,6 @@
 // src/commands/admin/embed.js
 // ============================================================
-//   Olympus Community Bot — Criador Visual de Embeds e Webhooks
+//   Tengoku Community Bot — Criador Visual de Embeds e Webhooks
 // ============================================================
 
 const { SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');

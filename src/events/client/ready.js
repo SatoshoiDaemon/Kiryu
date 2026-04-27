@@ -1,15 +1,15 @@
 // src/events/client/ready.js
 // ============================================================
-//   Olympus Community Bot — Evento: Bot Pronto
+//   Tengoku Community Bot — Evento: Bot Pronto
 // ============================================================
 
 const { ActivityType } = require('discord.js');
 const logger = require('@utils/logger');
 
 const ACTIVITIES = [
-    { name: '/config | Olympus Studio', type: ActivityType.Watching },
-    { name: 'sua comunidade crescer', type: ActivityType.Watching },
-    { name: '/ajuda | Olympus Studio', type: ActivityType.Playing },
+    { name: '/orbes | TengokuRP', type: ActivityType.Watching },
+    { name: 'O melhor cross RP', type: ActivityType.Watching },
+    { name: '/ajuda | TengokuRP', type: ActivityType.Playing },
 ];
 
 let activityIndex = 0;

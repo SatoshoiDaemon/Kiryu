@@ -1,12 +1,13 @@
 // src/commands/utility/ranking.js
 // ============================================================
-//   Olympus Community Bot — Ranking Unificado
+//   Tengoku Community Bot — Ranking Unificado
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const UserData = require('@models/UserData');
 const PartnershipTrack = require('@models/PartnershipTrack');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
+const economyManager = require('@utils/managers/economyManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,7 +16,7 @@ module.exports = {
         .addStringOption(o => o.setName('tipo').setDescription('Tipo de ranking').setRequired(true)
             .addChoices(
                 { name: '⭐ XP', value: 'xp' },
-                { name: '💰 Dinheiro', value: 'dinheiro' },
+                { name: '💰 Moedas', value: 'moedas' },
                 { name: '🤝 Parcerias', value: 'parcerias' },
                 { name: '💬 Mensagens', value: 'mensagens' },
                 { name: '🎙️ Tempo em Call', value: 'voz' },
@@ -28,6 +29,7 @@ module.exports = {
         const guildId = interaction.guildId;
 
         let title, data, formatRow;
+        const economyConfig = await economyManager.getConfig(guildId);
 
         switch (type) {
             case 'xp':
@@ -35,7 +37,7 @@ module.exports = {
                 data = await UserData.find({ guildId, 'xp.current': { $gt: 0 } }).sort({ 'xp.current': -1 }).limit(10);
                 formatRow = (d) => `Lvl **${d.xp.level}** — ${d.xp.current} XP`;
                 break;
-            case 'dinheiro':
+            case 'moedas':
                 title = '💰 Ranking de Riqueza';
                 data = await UserData.aggregate([
                     { $match: { guildId } },
@@ -43,7 +45,7 @@ module.exports = {
                     { $sort: { totalWealth: -1 } },
                     { $limit: 10 }
                 ]);
-                formatRow = (d) => `**${(d.totalWealth || 0).toLocaleString()}** moedas`;
+                formatRow = (d) => `**${economyManager.formatCurrency(d.totalWealth || 0, economyConfig, { withName: true })}**`;
                 break;
             case 'parcerias':
                 title = '🤝 Ranking de Parcerias (Staff)';
@@ -88,7 +90,7 @@ module.exports = {
             .setColor(PALETTE.accent)
             .setTitle(`🏆 TOP 10 — ${title}`)
             .setDescription(description)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.editReply({ embeds: [embed] });

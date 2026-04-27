@@ -1,7 +1,7 @@
 {
-  "name": "olympus-community-bot",
+  "name": "tengoku-community-bot",
   "version": "2.0.0",
-  "description": "Bot de comunidade premium desenvolvido pela Olympus Studio",
+  "description": "Bot de comunidade premium desenvolvido pela Tengoku",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
@@ -11,9 +11,9 @@
     "discord",
     "bot",
     "community",
-    "olympus"
+    "tengoku"
   ],
-  "author": "Olympus Studio",
+  "author": "Tengoku",
   "license": "OSCL",
   "dependencies": {
     "@discordjs/builders": "^1.9.0",
@@ -21,13 +21,14 @@
     "@google/generative-ai": "^0.21.0",
     "axios": "^1.7.9",
     "captcha-canvas": "^3.4.0",
+    "chalk": "^4.1.2",
     "discord.js": "^14.16.3",
     "dotenv": "^16.6.1",
     "module-alias": "^2.3.4",
     "mongoose": "^8.4.1",
     "ms": "^2.1.3",
     "node-cron": "^4.2.1",
-    "chalk": "^4.1.2"
+    "node-schedule": "^2.1.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"

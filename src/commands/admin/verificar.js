@@ -1,11 +1,11 @@
 // src/commands/admin/verificar.js
 // ============================================================
-//   Olympus Community Bot — Verificação Manual
+//   Tengoku Community Bot — Verificação Manual
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -35,7 +35,7 @@ module.exports = {
                 .setColor(PALETTE.success)
                 .setTitle('🛡️ Verificação Manual')
                 .setDescription(`${targetMember} foi verificado com sucesso por ${interaction.user}.`)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             return interaction.reply({ embeds: [embed] });

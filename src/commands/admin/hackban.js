@@ -1,11 +1,11 @@
 // src/commands/admin/hackban.js
 // ============================================================
-//   Olympus Community Bot — Hack Ban (ban por ID)
+//   Tengoku Community Bot — Hack Ban (ban por ID)
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const { registerModLog } = require('@utils/helpers/modHelper');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -43,7 +43,7 @@ module.exports = {
                     { name: 'Moderador', value: `${interaction.user} (\`${interaction.user.id}\`)`, inline: false },
                     { name: 'Caso', value: `#${log?.caseId || '?'}`, inline: true },
                 )
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             return interaction.reply({ embeds: [embed] });

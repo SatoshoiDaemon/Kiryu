@@ -1,6 +1,6 @@
 // src/commands/utility/parceria.js
 // ============================================================
-//   Olympus Community Bot — Comando /parceria
+//   Tengoku Community Bot — Comando /parceria
 //   Envia candidatura de parceria para análise da equipe
 // ============================================================
 

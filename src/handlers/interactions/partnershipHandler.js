@@ -1,12 +1,12 @@
 // src/handlers/interactions/partnershipHandler.js
 // ============================================================
-//   Olympus Community Bot — Handler de Parcerias
+//   Tengoku Community Bot — Handler de Parcerias
 //   Gerencia modais e botões de aprovação/recusa de parcerias
 // ============================================================
 
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 const logger = require('@utils/logger');
 
@@ -43,7 +43,7 @@ async function handlePartnershipModal(interaction) {
             { name: '👤 Enviado por', value: `${interaction.user} (\`${interaction.user.id}\`)`, inline: false },
         )
         .setThumbnail(interaction.user.displayAvatarURL())
-        .setFooter(olympusFooter('Candidatura pendente de análise'))
+        .setFooter(tengokuFooter('Candidatura pendente de análise'))
         .setTimestamp();
 
     const row = new ActionRowBuilder().addComponents(
@@ -113,7 +113,7 @@ async function handlePartnershipButton(interaction) {
                         `${description}\n\n` +
                         `🔗 **Acesse:** ${inviteLink}`
                     )
-                    .setFooter(olympusFooter())
+                    .setFooter(tengokuFooter())
                     .setTimestamp();
 
                 await announceChannel.send({ embeds: [announceEmbed] });
@@ -123,7 +123,7 @@ async function handlePartnershipButton(interaction) {
         // Atualiza o embed original
         const updatedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
             .setColor(PALETTE.success)
-            .setFooter(olympusFooter(`✅ Aceita por ${interaction.user.tag}`));
+            .setFooter(tengokuFooter(`✅ Aceita por ${interaction.user.tag}`));
 
         await interaction.update({ embeds: [updatedEmbed], components: [] });
     }
@@ -132,7 +132,7 @@ async function handlePartnershipButton(interaction) {
         // Atualiza o embed original
         const updatedEmbed = EmbedBuilder.from(interaction.message.embeds[0])
             .setColor(PALETTE.error)
-            .setFooter(olympusFooter(`❌ Recusada por ${interaction.user.tag}`));
+            .setFooter(tengokuFooter(`❌ Recusada por ${interaction.user.tag}`));
 
         await interaction.update({ embeds: [updatedEmbed], components: [] });
 

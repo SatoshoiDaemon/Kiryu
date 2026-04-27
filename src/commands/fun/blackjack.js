@@ -1,7 +1,7 @@
 // src/commands/fun/blackjack.js
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 const SUITS  = ['♠️', '♥️', '♦️', '♣️'];
 const VALUES = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
@@ -40,8 +40,8 @@ const games = new Map();
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('blackjack')
-        .setDescription('🃏 Jogue blackjack contra o dealer.')
+        .setName('vinte-e-um')
+        .setDescription('🃏 Jogue vinte e um contra o dealer.')
         .addIntegerOption(o => o.setName('aposta').setDescription('Valor da aposta').setRequired(true).setMinValue(1)),
 
     async execute(interaction) {
@@ -56,7 +56,7 @@ module.exports = {
 
         const userData = await economyManager.getUser(userId, guildId);
         if (userData.balance < aposta) {
-            return interaction.reply({ content: `❌ Você não tem ${aposta} ${config.currencySymbol} na carteira.`, flags: 64 });
+            return interaction.reply({ content: `❌ Você não tem ${economyManager.formatCurrency(aposta, config)} na carteira.`, flags: 64 });
         }
 
         // Desconta a aposta
@@ -84,9 +84,9 @@ module.exports = {
                 .addFields(
                     { name: 'Sua mão', value: `${formatHand(playerHand)} = **21**`, inline: true },
                     { name: 'Dealer', value: `${formatHand(dealerHand)} = **${handValue(dealerHand)}**`, inline: true },
-                    { name: 'Ganho', value: `+${winnings} ${config.currencySymbol}`, inline: false },
+                    { name: 'Ganho', value: `+${economyManager.formatCurrency(winnings, config)}`, inline: false },
                 )
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             return interaction.reply({ embeds: [embed] });
@@ -98,9 +98,9 @@ module.exports = {
             .addFields(
                 { name: 'Sua mão', value: `${formatHand(playerHand)} = **${playerTotal}**`, inline: true },
                 { name: 'Dealer', value: `${formatHand(dealerHand, true)} = **${dealerShown}+?**`, inline: true },
-                { name: 'Aposta', value: `${aposta} ${config.currencySymbol}`, inline: false },
+                { name: 'Aposta', value: economyManager.formatCurrency(aposta, config), inline: false },
             )
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const row = new ActionRowBuilder().addComponents(

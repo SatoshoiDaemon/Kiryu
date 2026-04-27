@@ -1,12 +1,12 @@
 // src/commands/utility/userinfo.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const xpManager = require('@utils/managers/xpManager');
 const economyManager = require('@utils/managers/economyManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('userinfo')
+        .setName('usuario')
         .setDescription('👤 Exibe informações sobre um usuário.')
         .addUserOption(o => o.setName('usuario').setDescription('Usuário (padrão: você)').setRequired(false)),
 
@@ -38,12 +38,11 @@ module.exports = {
                 { name: 'Entrou no servidor', value: `<t:${Math.floor(target.joinedTimestamp / 1000)}:D>`, inline: true },
                 { name: 'Cargos principais', value: roles, inline: false },
                 { name: '⭐ XP', value: `Nível **${xpData.level}** (${xpData.xp.toLocaleString('pt-BR')} XP)`, inline: true },
-                { name: `${ecoConfig.currencySymbol} Economia`, value: `**${(ecoData.balance + ecoData.bank).toLocaleString('pt-BR')}** ${ecoConfig.currencyName}`, inline: true },
+                { name: `${ecoConfig.currencySymbol} Economia`, value: `**${economyManager.formatCurrency(ecoData.balance + ecoData.bank, ecoConfig, { withName: true })}**`, inline: true },
             )
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });
     },
 };
-

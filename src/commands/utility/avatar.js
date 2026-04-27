@@ -1,6 +1,6 @@
 // src/commands/utility/avatar.js
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -16,7 +16,7 @@ module.exports = {
             .setColor(PALETTE.accent)
             .setTitle(`Avatar de ${target.username}`)
             .setImage(avatarUrl)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const row = new ActionRowBuilder().addComponents(

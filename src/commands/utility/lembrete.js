@@ -1,7 +1,7 @@
 // src/commands/utility/lembrete.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Reminder = require('@models/Reminder');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const ms = require('ms');
 
 module.exports = {
@@ -35,7 +35,7 @@ module.exports = {
             .setColor(PALETTE.success)
             .setTitle('⏰ Lembrete Criado!')
             .setDescription(`Vou te lembrar sobre **"${reason}"** <t:${Math.floor(expiresAt.getTime() / 1000)}:R>.`)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

@@ -1,6 +1,6 @@
 // src/handlers/commandHandler.js
 // ============================================================
-//   Olympus Community Bot — Carregador de Comandos
+//   Tengoku Community Bot — Carregador de Comandos
 // ============================================================
 
 const fs   = require('fs');

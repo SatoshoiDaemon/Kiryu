@@ -1,12 +1,50 @@
 // src/utils/managers/economyManager.js
 // ============================================================
-//   Olympus Community Bot — Gerenciador de Economia
+//   Tengoku Community Bot — Gerenciador de Economia
 // ============================================================
 
 const Guild = require('@models/Guild');
 const UserData = require('@models/UserData');
 
 class EconomyManager {
+    sanitizeAmount(value, fallback = 0) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) return fallback;
+        return Math.max(0, Math.floor(number));
+    }
+
+    sanitizeSignedAmount(value, fallback = 0) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) return fallback;
+        return Math.trunc(number);
+    }
+
+    normalizeConfig(config = {}) {
+        return {
+            ...config,
+            currencyName: String(config.currencyName || 'moedas').trim() || 'moedas',
+            currencySymbol: String(config.currencySymbol || '🪙').trim() || '🪙',
+            dailyAmount: this.sanitizeAmount(config.dailyAmount, 100),
+            dailyCooldown: this.sanitizeAmount(config.dailyCooldown, 86400),
+            workMin: this.sanitizeAmount(config.workMin, 50),
+            workMax: this.sanitizeAmount(config.workMax, 200),
+            workCooldown: this.sanitizeAmount(config.workCooldown, 3600),
+            robMinBalance: this.sanitizeAmount(config.robMinBalance, 100),
+        };
+    }
+
+    formatCurrency(amount, config = {}, options = {}) {
+        const normalized = this.normalizeConfig(config);
+        const value = this.sanitizeAmount(amount).toLocaleString('pt-BR');
+        const symbol = normalized.currencySymbol;
+
+        if (options.withName) {
+            return `${value} ${symbol} ${normalized.currencyName}`;
+        }
+
+        return `${value} ${symbol}`;
+    }
+
     /**
      * Retorna a configuração de economia para um servidor.
      * @param {string} guildId
@@ -16,7 +54,7 @@ class EconomyManager {
         if (!guild) {
             guild = await Guild.create({ guildId });
         }
-        return guild.economyConfig;
+        return this.normalizeConfig(guild.economyConfig);
     }
 
     /**
@@ -29,8 +67,8 @@ class EconomyManager {
         return {
             userId: data.userId,
             guildId: data.guildId,
-            balance: data.economy?.balance || 0,
-            bank: data.economy?.bank || 0
+            balance: this.sanitizeAmount(data.economy?.balance),
+            bank: this.sanitizeAmount(data.economy?.bank)
         };
     }
 
@@ -54,16 +92,28 @@ class EconomyManager {
      * @param {number} amount (pode ser negativo)
      */
     async addBalance(userId, guildId, amount) {
-        await this.ensureUser(userId, guildId);
-        await UserData.findOneAndUpdate(
+        const delta = this.sanitizeSignedAmount(amount);
+
+        const updated = await UserData.findOneAndUpdate(
             { userId, guildId },
-            { $inc: { 'economy.balance': amount } }
+            [
+                {
+                    $set: {
+                        userId,
+                        guildId,
+                        'economy.balance': {
+                            $max: [0, { $add: [{ $ifNull: ['$economy.balance', 0] }, delta] }]
+                        }
+                    }
+                }
+            ],
+            { upsert: true, returnDocument: 'after' }
         );
-        // Garante que o saldo nunca fique negativo
-        await UserData.findOneAndUpdate(
-            { userId, guildId, 'economy.balance': { $lt: 0 } },
-            { $set: { 'economy.balance': 0 } }
-        );
+
+        return {
+            balance: this.sanitizeAmount(updated.economy?.balance),
+            bank: this.sanitizeAmount(updated.economy?.bank),
+        };
     }
 
     /**
@@ -73,16 +123,28 @@ class EconomyManager {
      * @param {number} amount
      */
     async addBank(userId, guildId, amount) {
-        await this.ensureUser(userId, guildId);
-        await UserData.findOneAndUpdate(
+        const delta = this.sanitizeSignedAmount(amount);
+
+        const updated = await UserData.findOneAndUpdate(
             { userId, guildId },
-            { $inc: { 'economy.bank': amount } }
+            [
+                {
+                    $set: {
+                        userId,
+                        guildId,
+                        'economy.bank': {
+                            $max: [0, { $add: [{ $ifNull: ['$economy.bank', 0] }, delta] }]
+                        }
+                    }
+                }
+            ],
+            { upsert: true, returnDocument: 'after' }
         );
-        // Garante que o banco nunca fique negativo
-        await UserData.findOneAndUpdate(
-            { userId, guildId, 'economy.bank': { $lt: 0 } },
-            { $set: { 'economy.bank': 0 } }
-        );
+
+        return {
+            balance: this.sanitizeAmount(updated.economy?.balance),
+            bank: this.sanitizeAmount(updated.economy?.bank),
+        };
     }
 
     /**
@@ -94,12 +156,21 @@ class EconomyManager {
      */
     async setBalance(userId, guildId, balance, bank = undefined) {
         await this.ensureUser(userId, guildId);
-        const update = { 'economy.balance': balance };
+        const update = { 'economy.balance': this.sanitizeAmount(balance) };
         if (bank !== undefined) {
-            update['economy.bank'] = bank;
+            update['economy.bank'] = this.sanitizeAmount(bank);
         }
 
-        await UserData.findOneAndUpdate({ userId, guildId }, { $set: update });
+        const updated = await UserData.findOneAndUpdate(
+            { userId, guildId },
+            { $set: update },
+            { upsert: true, returnDocument: 'after' }
+        );
+
+        return {
+            balance: this.sanitizeAmount(updated.economy?.balance),
+            bank: this.sanitizeAmount(updated.economy?.bank),
+        };
     }
 
     /**
@@ -118,9 +189,9 @@ class EconomyManager {
         return users.map(u => ({
             userId: u.userId,
             guildId: u.guildId,
-            balance: u.economy?.balance || 0,
-            bank: u.economy?.bank || 0,
-            total: u.total
+            balance: this.sanitizeAmount(u.economy?.balance),
+            bank: this.sanitizeAmount(u.economy?.bank),
+            total: this.sanitizeAmount(u.total)
         }));
     }
 

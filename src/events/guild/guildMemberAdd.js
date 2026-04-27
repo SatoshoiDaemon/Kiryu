@@ -1,7 +1,7 @@
 // src/events/guild/guildMemberAdd.js
 const { EmbedBuilder } = require('discord.js');
 const Guild = require('@models/Guild');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 const logger = require('@utils/logger');
 
@@ -33,7 +33,7 @@ module.exports = {
                         .setTitle(`Bem-vindo(a) ao ${member.guild.name}!`)
                         .setDescription(message)
                         .setThumbnail(member.user.displayAvatarURL({ size: 256 }))
-                        .setFooter(olympusFooter(`Membro #${memberCount.toLocaleString('pt-BR')}`))
+                        .setFooter(tengokuFooter(`Membro #${memberCount.toLocaleString('pt-BR')}`))
                         .setTimestamp();
 
                     await channel.send({ embeds: [embed] }).catch(err =>

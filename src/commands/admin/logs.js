@@ -1,12 +1,12 @@
 // src/commands/admin/logs.js
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const ModLog = require('@models/ModLog');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const permissionsManager = require('@utils/managers/permissionsManager');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('logs')
+        .setName('registros')
         .setDescription('📋 Visualiza o histórico de moderação do servidor.')
         .addUserOption(o => o.setName('usuario').setDescription('Filtrar por usuário').setRequired(false))
         .addStringOption(o => o.setName('acao').setDescription('Filtrar por ação').setRequired(false)
@@ -57,7 +57,7 @@ module.exports = {
                     return `**#${log.caseId || '?'}** | ${emoji} **${log.action}** — <@${log.userId}> — \`${date}\`\n> ${log.reason || 'Sem motivo'}`;
                 }).join('\n\n')
             )
-            .setFooter(olympusFooter(`${logs.length} registro(s) encontrado(s)`))
+            .setFooter(tengokuFooter(`${logs.length} registro(s) encontrado(s)`))
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed], flags: 64 });

@@ -1,7 +1,7 @@
 // src/commands/social/divorciar.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const Marriage = require('@models/Marriage');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -27,7 +27,7 @@ module.exports = {
             .setColor(PALETTE.error)
             .setTitle('💔 Divórcio')
             .setDescription(`${interaction.user} se divorciou de ${partner ? partner.toString() : `<@${partnerId}>`}.`)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

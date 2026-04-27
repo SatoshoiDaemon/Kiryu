@@ -1,11 +1,11 @@
 // src/events/interaction/interactionCreate.js
 // ============================================================
-//   Olympus Community Bot — Roteador Central de Interações
+//   Tengoku Community Bot — Roteador Central de Interações
 // ============================================================
 
 const { EmbedBuilder } = require('discord.js');
 const logger = require('@utils/logger');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const configHandler = require('@handlers/interactions/configHandler');
 const modHandler = require('@handlers/interactions/modHandler');
 const embedHandler = require('@handlers/interactions/embedHandler');
@@ -280,7 +280,7 @@ async function handleRPButton(interaction) {
     const embed = new EmbedBuilder()
         .setColor(rpCfg.color)
         .setDescription(`${rpCfg.emoji} <@${allowedUserId}> ${rpCfg.label} <@${originalUserId}>!${extraMsg}`)
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     if (gifUrl) embed.setImage(gifUrl);
@@ -302,7 +302,7 @@ async function handleMinesButton(interaction) {
     const economyManager = require('@utils/managers/economyManager');
 
     const game = games.get(ownerId);
-    if (!game) return interaction.reply({ content: '❌ Partida não encontrada. Inicie com `/mines`.', flags: 64 });
+    if (!game) return interaction.reply({ content: '❌ Partida não encontrada. Inicie com `/campo-minado`.', flags: 64 });
 
     const config = await economyManager.getConfig(game.guildId);
 
@@ -319,8 +319,8 @@ async function handleMinesButton(interaction) {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.success)
             .setTitle('💰 Ganhos Coletados!')
-            .setDescription(`Multiplicador: **${game.multiplier}x**\nVocê coletou **${winnings} ${config.currencySymbol}**!`)
-            .setFooter(olympusFooter())
+            .setDescription(`Multiplicador: **${game.multiplier}x**\nVocê coletou **${economyManager.formatCurrency(winnings, config)}**!`)
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const grid = buildGrid(game, true);
@@ -336,8 +336,8 @@ async function handleMinesButton(interaction) {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.error)
             .setTitle('💣 BOOM! Você perdeu!')
-            .setDescription(`Você acertou uma bomba e perdeu **${game.bet} ${config.currencySymbol}**!`)
-            .setFooter(olympusFooter())
+            .setDescription(`Você acertou uma bomba e perdeu **${economyManager.formatCurrency(game.bet, config)}**!`)
+            .setFooter(tengokuFooter())
             .setTimestamp();
         const grid = buildGrid(game, true);
         grid.push(buildCollectRow(ownerId, true));
@@ -357,8 +357,8 @@ async function handleMinesButton(interaction) {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.success)
             .setTitle('🎉 Incrível! Todas as casas seguras!')
-            .setDescription(`Multiplicador: **${game.multiplier}x**\nVocê ganhou **${winnings} ${config.currencySymbol}**!`)
-            .setFooter(olympusFooter())
+            .setDescription(`Multiplicador: **${game.multiplier}x**\nVocê ganhou **${economyManager.formatCurrency(winnings, config)}**!`)
+            .setFooter(tengokuFooter())
             .setTimestamp();
         const grid = buildGrid(game, true);
         grid.push(buildCollectRow(ownerId, true));
@@ -367,9 +367,9 @@ async function handleMinesButton(interaction) {
 
     const embed = new EmbedBuilder()
         .setColor(PALETTE.primary)
-        .setTitle('💣 Mines — Campo Minado')
-        .setDescription(`Aposta: **${game.bet} ${config.currencySymbol}**\nMultiplicador: **${game.multiplier}x**\nGanho atual: **${winnings} ${config.currencySymbol}**\n\n💎 Casas reveladas: ${game.revealed.size}/${totalSafe}`)
-        .setFooter(olympusFooter())
+        .setTitle('💣 Campo Minado')
+        .setDescription(`Aposta: **${economyManager.formatCurrency(game.bet, config)}**\nMultiplicador: **${game.multiplier}x**\nGanho atual: **${economyManager.formatCurrency(winnings, config)}**\n\n💎 Casas reveladas: ${game.revealed.size}/${totalSafe}`)
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     const grid = buildGrid(game);
@@ -404,7 +404,7 @@ async function replyError(interaction, err) {
         .setColor(PALETTE.error)
         .setTitle('Erro Inesperado')
         .setDescription('Ocorreu um erro ao processar sua solicitação. Por favor, tente novamente.')
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     try {

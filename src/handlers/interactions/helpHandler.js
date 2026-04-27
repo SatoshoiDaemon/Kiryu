@@ -1,6 +1,6 @@
 // src/events/interaction/helpHandler.js
 const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder } = require('discord.js');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 const { CATEGORIES } = require('@commands/utility/ajuda');
 const economyManager = require('@utils/managers/economyManager');
@@ -22,7 +22,7 @@ async function handleHelpSelect(interaction) {
         .setDescription(
             data.commands.map(c => `**${c.name}**\n> ${c.desc}`).join('\n\n')
         )
-        .setFooter(olympusFooter('Use / para executar qualquer comando'))
+        .setFooter(tengokuFooter('Use / para executar qualquer comando'))
         .setTimestamp();
 
     const backRow = new ActionRowBuilder().addComponents(
@@ -47,7 +47,7 @@ async function handleHelpBack(interaction) {
             `Bem-vindo(a) à central de ajuda!\n\n` +
             `Use o menu abaixo para navegar pelas categorias de comandos.\n` +
             `Todos os comandos são executados via **/**.\n\n` +
-            `> Desenvolvido por **Olympus Studio** — v${version}`
+            `> Desenvolvido por **Tengoku** — v${version}`
         )
         .addFields(
             { name: '⚙️ Administração', value: 'Configuração, moderação e gerenciamento', inline: true },
@@ -57,7 +57,7 @@ async function handleHelpBack(interaction) {
             { name: '💙 Social', value: 'Interações sociais', inline: true },
         )
         .setThumbnail(interaction.client.user.displayAvatarURL())
-        .setFooter(olympusFooter(`v${version}`))
+        .setFooter(tengokuFooter(`v${version}`))
         .setTimestamp();
 
     const menu = new StringSelectMenuBuilder()
@@ -102,7 +102,7 @@ async function handleMarriageButton(interaction) {
             .setColor(PALETTE.accent)
             .setTitle('💍 Casamento Realizado!')
             .setDescription(`<@${proposerId}> e <@${targetId}> agora estão casados! 🎊`)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.update({ embeds: [embed], components: [] });
@@ -113,7 +113,7 @@ async function handleMarriageButton(interaction) {
             .setColor(PALETTE.error)
             .setTitle('💔 Pedido Recusado')
             .setDescription(`<@${targetId}> recusou o pedido de casamento de <@${proposerId}>.`)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.update({ embeds: [embed], components: [] });
@@ -130,12 +130,12 @@ async function handleBlackjackButton(interaction) {
     const [, action, userId] = interaction.customId.split(':');
 
     if (interaction.user.id !== userId) {
-        return interaction.reply({ content: '❌ Esta não é sua partida de blackjack!', flags: 64 });
+        return interaction.reply({ content: '❌ Esta não é sua partida de vinte e um!', flags: 64 });
     }
 
     const game = games.get(userId);
     if (!game) {
-        return interaction.reply({ content: '❌ Partida não encontrada. Inicie uma nova com `/blackjack`.', flags: 64 });
+            return interaction.reply({ content: '❌ Partida não encontrada. Inicie uma nova com `/vinte-e-um`.', flags: 64 });
     }
 
     const config = await economyManager.getConfig(game.guildId);
@@ -155,12 +155,12 @@ async function handleBlackjackButton(interaction) {
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.error)
                 .setTitle('🃏 Blackjack — Bust!')
-                .setDescription(`Você passou de 21 e perdeu **${game.aposta} ${config.currencySymbol}**!`)
+                .setDescription(`Você passou de 21 e perdeu **${economyManager.formatCurrency(game.aposta, config)}**!`)
                 .addFields(
                     { name: 'Sua mão', value: `${formatHand(game.playerHand)} = **${playerTotal}**`, inline: true },
                     { name: 'Dealer', value: `${formatHand(game.dealerHand)} = **${handValue(game.dealerHand)}**`, inline: true },
                 )
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
 
             return interaction.update({ embeds: [embed], components: [] });
@@ -172,9 +172,9 @@ async function handleBlackjackButton(interaction) {
             .addFields(
                 { name: 'Sua mão', value: `${formatHand(game.playerHand)} = **${playerTotal}**`, inline: true },
                 { name: 'Dealer', value: `${formatHand(game.dealerHand, true)} = **${cardValue(game.dealerHand[0])}+?**`, inline: true },
-                { name: 'Aposta', value: `${game.aposta} ${config.currencySymbol}`, inline: false },
+                { name: 'Aposta', value: economyManager.formatCurrency(game.aposta, config), inline: false },
             )
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const row = new ActionRowBuilder().addComponents(
@@ -197,16 +197,16 @@ async function handleBlackjackButton(interaction) {
 
         let result, color, winnings = 0;
         if (dealerTotal > 21 || playerTotal > dealerTotal) {
-            result = `🎉 Você ganhou! **+${game.aposta * 2} ${config.currencySymbol}**`;
+            result = `🎉 Você ganhou! **+${economyManager.formatCurrency(game.aposta * 2, config)}**`;
             color = PALETTE.success;
             winnings = game.aposta * 2;
             await economyManager.addBalance(userId, game.guildId, winnings);
         } else if (playerTotal === dealerTotal) {
-            result = `🤝 Empate! Aposta devolvida: **${game.aposta} ${config.currencySymbol}**`;
+            result = `🤝 Empate! Aposta devolvida: **${economyManager.formatCurrency(game.aposta, config)}**`;
             color = PALETTE.info;
             await economyManager.addBalance(userId, game.guildId, game.aposta);
         } else {
-            result = `😔 Você perdeu **${game.aposta} ${config.currencySymbol}**.`;
+            result = `😔 Você perdeu **${economyManager.formatCurrency(game.aposta, config)}**.`;
             color = PALETTE.error;
         }
 
@@ -218,7 +218,7 @@ async function handleBlackjackButton(interaction) {
                 { name: 'Sua mão', value: `${formatHand(game.playerHand)} = **${playerTotal}**`, inline: true },
                 { name: 'Dealer', value: `${formatHand(game.dealerHand)} = **${dealerTotal}**`, inline: true },
             )
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.update({ embeds: [embed], components: [] });
@@ -248,7 +248,7 @@ async function handleSuggestionModal(interaction) {
         .setDescription(content)
         .addFields({ name: 'Enviado por', value: `${interaction.user} (\`${interaction.user.id}\`)`, inline: false })
         .setThumbnail(interaction.user.displayAvatarURL())
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     const msg = await channel.send({ embeds: [embed] });
@@ -313,7 +313,7 @@ async function handleInstafeedModal(interaction) {
             { name: '👤 Publicado por', value: `${interaction.user} (\`${interaction.user.tag}\`)`, inline: false }
         )
         .setThumbnail(interaction.user.displayAvatarURL())
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     await channel.send({ content: url, embeds: [embed] });

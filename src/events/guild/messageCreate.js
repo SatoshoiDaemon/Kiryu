@@ -2,7 +2,7 @@
 // Responsável pelo ganho de XP por mensagem e rastreamento de parcerias
 const { EmbedBuilder } = require('discord.js');
 const xpManager = require('@utils/managers/xpManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 const Guild = require('@models/Guild');
 const PartnershipTrack = require('@models/PartnershipTrack');
@@ -58,7 +58,7 @@ module.exports = {
                 .setTitle(`🎲 Rolagem de ${message.author.username}`)
                 .setDescription(description)
                 .addFields({ name: 'Total Ofertado', value: `**${totalSum}**` })
-                .setFooter(olympusFooter());
+                .setFooter(tengokuFooter());
 
             await message.reply({ embeds: [embed] }).catch(() => null);
         }
@@ -156,7 +156,7 @@ async function handleLevelUp(message, result, config, guildId) {
         .setColor(branding.accent || PALETTE.accent)
         .setDescription(levelMsg)
         .setThumbnail(message.author.displayAvatarURL())
-        .setFooter(olympusFooter())
+        .setFooter(tengokuFooter())
         .setTimestamp();
 
     await channel.send({ embeds: [embed] }).catch(() => null);

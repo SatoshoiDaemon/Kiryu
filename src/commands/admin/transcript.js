@@ -1,13 +1,13 @@
 // src/commands/admin/transcript.js
 // ============================================================
-//   Olympus Community Bot — Transcript de Canal em HTML
+//   Tengoku Community Bot — Transcript de Canal em HTML
 // ============================================================
 
 const { SlashCommandBuilder, PermissionFlagsBits, AttachmentBuilder } = require('discord.js');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('transcript')
+        .setName('transcricao')
         .setDescription('📄 Gera um transcript de um canal como arquivo HTML.')
         .addChannelOption(o => o.setName('canal').setDescription('Canal para transcrever').setRequired(true))
         .addIntegerOption(o => o.setName('quantidade').setDescription('Quantidade de mensagens (máx 200)').setRequired(false).setMinValue(10).setMaxValue(200))

@@ -1,7 +1,7 @@
 // src/commands/social/corar.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { fetchWaifuImage } = require('@utils/helpers/embedHelper');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -15,7 +15,7 @@ module.exports = {
             .setColor(PALETTE.accent)
             .setDescription(`😳 **${interaction.user.username}** ficou corado(a)!`)
             .setImage(gifUrl)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         // Como é auto-referencial, não tem botão retribuir nem cálculo de casamento

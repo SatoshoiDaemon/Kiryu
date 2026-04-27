@@ -1,6 +1,6 @@
 // src/events/guild/voiceStateUpdate.js
 // ============================================================
-//   Olympus Community Bot — Rastreamento de Tempo em Call
+//   Tengoku Community Bot — Rastreamento de Tempo em Call
 // ============================================================
 
 const UserData = require('@models/UserData');

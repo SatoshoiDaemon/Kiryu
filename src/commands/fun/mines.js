@@ -1,11 +1,11 @@
 // src/commands/economy/mines.js
 // ============================================================
-//   Olympus Community Bot — Minigame Mines (Campo Minado)
+//   Tengoku Community Bot — Minigame Campo Minado
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 const games = new Map();
 
@@ -80,8 +80,8 @@ function buildCollectRow(userId, disabled = false) {
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('mines')
-        .setDescription('💣 Jogue Campo Minado! Revele casas e colete antes de explodir.')
+        .setName('campo-minado')
+        .setDescription('💣 Jogue campo minado, revele casas e colete antes de explodir.')
         .addIntegerOption(o => o.setName('aposta').setDescription('Valor da aposta').setRequired(true).setMinValue(10)),
 
     async execute(interaction) {
@@ -92,10 +92,10 @@ module.exports = {
         const config = await economyManager.getConfig(guildId);
         if (!config.enabled) return interaction.reply({ content: '❌ Economia desativada.', flags: 64 });
 
-        if (games.has(userId)) return interaction.reply({ content: '❌ Você já tem uma partida de Mines ativa! Colete ou finalize.', flags: 64 });
+        if (games.has(userId)) return interaction.reply({ content: '❌ Você já tem uma partida de campo minado ativa! Colete ou finalize.', flags: 64 });
 
         const userData = await economyManager.getUser(userId, guildId);
-        if (userData.balance < bet) return interaction.reply({ content: `❌ Saldo insuficiente. Você tem **${userData.balance} ${config.currencySymbol}**.`, flags: 64 });
+        if (userData.balance < bet) return interaction.reply({ content: `❌ Saldo insuficiente. Você tem **${economyManager.formatCurrency(userData.balance, config)}**.`, flags: 64 });
 
         await economyManager.addBalance(userId, guildId, -bet);
 
@@ -104,9 +104,9 @@ module.exports = {
 
         const embed = new EmbedBuilder()
             .setColor(PALETTE.primary)
-            .setTitle('💣 Mines — Campo Minado')
-            .setDescription(`Aposta: **${bet} ${config.currencySymbol}**\nMultiplicador: **${game.multiplier}x**\nGanho atual: **${Math.floor(bet * game.multiplier)} ${config.currencySymbol}**\n\nClique nas casas para revelar! 💎 = seguro, 💣 = boom!`)
-            .setFooter(olympusFooter())
+            .setTitle('💣 Campo Minado')
+            .setDescription(`Aposta: **${economyManager.formatCurrency(bet, config)}**\nMultiplicador: **${game.multiplier}x**\nGanho atual: **${economyManager.formatCurrency(Math.floor(bet * game.multiplier), config)}**\n\nClique nas casas para revelar! 💎 = seguro, 💣 = boom!`)
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const grid = buildGrid(game);

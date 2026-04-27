@@ -1,7 +1,7 @@
 // src/commands/social/cry.js
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const { fetchWaifuImage } = require('@utils/helpers/embedHelper');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const marriageManager = require('@utils/managers/marriageManager');
 
 const MESSAGES = [
@@ -42,7 +42,7 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.info)
             .setDescription(message)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
         if (gifUrl) embed.setImage(gifUrl);
 

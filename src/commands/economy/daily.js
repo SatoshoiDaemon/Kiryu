@@ -1,7 +1,7 @@
 // src/commands/economy/daily.js
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -26,7 +26,7 @@ module.exports = {
                 .setColor(PALETTE.warning)
                 .setTitle('⏳ Daily já coletado')
                 .setDescription(`Você já coletou seu daily hoje! Volte em **${hours}h ${minutes}min**.`)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
             return interaction.reply({ embeds: [embed], flags: 64 });
         }
@@ -41,14 +41,14 @@ module.exports = {
         const embed = new EmbedBuilder()
             .setColor(PALETTE.success)
             .setTitle('💰 Daily Coletado!')
-            .setDescription(`Você recebeu **${total} ${config.currencySymbol} ${config.currencyName}**!`)
+            .setDescription(`Você recebeu **${economyManager.formatCurrency(total, config, { withName: true })}**!`)
             .addFields(
-                { name: 'Base', value: `${config.dailyAmount} ${config.currencySymbol}`, inline: true },
-                { name: 'Bônus de Streak', value: bonus > 0 ? `+${bonus} ${config.currencySymbol}` : 'Nenhum', inline: true },
+                { name: 'Base', value: economyManager.formatCurrency(config.dailyAmount, config), inline: true },
+                { name: 'Bônus de Streak', value: bonus > 0 ? `+${economyManager.formatCurrency(bonus, config)}` : 'Nenhum', inline: true },
                 { name: 'Streak Atual', value: `🔥 ${newStreak} dia(s)`, inline: true },
             )
             .setThumbnail(interaction.user.displayAvatarURL())
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });

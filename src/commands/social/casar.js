@@ -1,7 +1,7 @@
 // src/commands/social/casar.js
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 const Marriage = require('@models/Marriage');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -40,7 +40,7 @@ module.exports = {
             .setColor(PALETTE.accent)
             .setTitle('💍 Pedido de Casamento!')
             .setDescription(`${interaction.user} está pedindo ${target} em casamento!\n\n${target}, você aceita?`)
-            .setFooter(olympusFooter('O pedido expira em 60 segundos'))
+            .setFooter(tengokuFooter('O pedido expira em 60 segundos'))
             .setTimestamp();
 
         const row = new ActionRowBuilder().addComponents(

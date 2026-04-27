@@ -1,15 +1,15 @@
 // src/commands/admin/notes.js
 // ============================================================
-//   Olympus Community Bot — Notas de Moderação
+//   Tengoku Community Bot — Notas de Moderação
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder, PermissionFlagsBits } = require('discord.js');
 const Note = require('@models/Note');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
-        .setName('notes')
+        .setName('notas')
         .setDescription('📝 Gerencie notas de moderação de um membro.')
         .addSubcommand(sub => sub.setName('add').setDescription('📝 Adicionar nota')
             .addUserOption(o => o.setName('usuario').setDescription('Membro').setRequired(true))
@@ -18,7 +18,7 @@ module.exports = {
             .addUserOption(o => o.setName('usuario').setDescription('Membro').setRequired(true)))
         .addSubcommand(sub => sub.setName('remove').setDescription('🗑️ Remover uma nota específica')
             .addUserOption(o => o.setName('usuario').setDescription('Membro').setRequired(true))
-            .addIntegerOption(o => o.setName('indice').setDescription('Índice da nota (veja com /notes ver)').setRequired(true).setMinValue(1)))
+            .addIntegerOption(o => o.setName('indice').setDescription('Índice da nota (veja com /notas ver)').setRequired(true).setMinValue(1)))
         .addSubcommand(sub => sub.setName('wipe').setDescription('💣 Remover todas as notas de um membro')
             .addUserOption(o => o.setName('usuario').setDescription('Membro').setRequired(true)))
         .setDefaultMemberPermissions(PermissionFlagsBits.ModerateMembers),
@@ -36,7 +36,7 @@ module.exports = {
                 .setColor(PALETTE.success)
                 .setTitle('📝 Nota Adicionada')
                 .setDescription(`Nota adicionada para ${target}:\n> ${content}`)
-                .setFooter(olympusFooter(`Por ${interaction.user.tag}`))
+                .setFooter(tengokuFooter(`Por ${interaction.user.tag}`))
                 .setTimestamp();
             return interaction.reply({ embeds: [embed], flags: 64 });
         }
@@ -53,7 +53,7 @@ module.exports = {
                     return `**${i + 1}.** ${n.content}\n> Por <@${n.moderator}> — \`${date}\``;
                 }).join('\n\n'))
                 .setThumbnail(target.displayAvatarURL())
-                .setFooter(olympusFooter(`${notes.length} nota(s)`))
+                .setFooter(tengokuFooter(`${notes.length} nota(s)`))
                 .setTimestamp();
             return interaction.reply({ embeds: [embed], flags: 64 });
         }
@@ -63,7 +63,7 @@ module.exports = {
             const notes = await Note.find({ guildId, userId: target.id }).sort({ createdAt: -1 });
 
             if (index < 0 || index >= notes.length) {
-                return interaction.reply({ content: `❌ Índice inválido. Use \`/notes ver\` para ver os índices (1-${notes.length}).`, flags: 64 });
+                return interaction.reply({ content: `❌ Índice inválido. Use \`/notas ver\` para ver os índices (1-${notes.length}).`, flags: 64 });
             }
 
             await Note.findByIdAndDelete(notes[index]._id);

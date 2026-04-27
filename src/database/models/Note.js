@@ -1,6 +1,6 @@
 // src/database/models/Note.js
 // ============================================================
-//   Olympus Community Bot — Notas de Moderação
+//   Tengoku Community Bot — Notas de Moderação
 // ============================================================
 
 const { Schema, model } = require('mongoose');

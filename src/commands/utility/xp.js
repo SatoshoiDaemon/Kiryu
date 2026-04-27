@@ -2,7 +2,7 @@
 const { SlashCommandBuilder, PermissionFlagsBits, EmbedBuilder } = require('discord.js');
 const xpManager = require('@utils/managers/xpManager');
 const permissionsManager = require('@utils/managers/permissionsManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -20,22 +20,20 @@ module.exports = {
         }
 
         const data = await xpManager.getUser(target.id, guildId);
-        const nextLevelXP = xpManager.xpForLevel(data.level + 1);
-        const progress = Math.floor((data.xp / nextLevelXP) * 100);
-
-        const progressBar = buildProgressBar(data.xp, nextLevelXP);
+        const progress = xpManager.getProgress(data.xp);
+        const progressBar = buildProgressBar(progress.current, progress.required);
 
         const embed = new EmbedBuilder()
             .setColor(PALETTE.accent)
             .setTitle(`⭐ XP de ${target.username}`)
             .addFields(
-                { name: 'Nível', value: `**${data.level}**`, inline: true },
-                { name: 'XP Total', value: `**${data.xp.toLocaleString('pt-BR')}**`, inline: true },
-                { name: 'Próximo Nível', value: `**${nextLevelXP.toLocaleString('pt-BR')} XP**`, inline: true },
-                { name: `Progresso (${progress}%)`, value: progressBar, inline: false },
+                { name: 'Nível', value: `**${progress.level}**`, inline: true },
+                { name: 'XP Total', value: `**${progress.xp.toLocaleString('pt-BR')}**`, inline: true },
+                { name: 'Próximo Nível', value: `**${progress.nextLevelXP.toLocaleString('pt-BR')} XP**`, inline: true },
+                { name: `Progresso (${progress.percent}%)`, value: progressBar, inline: false },
             )
             .setThumbnail(target.displayAvatarURL())
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         return interaction.reply({ embeds: [embed] });
@@ -43,7 +41,9 @@ module.exports = {
 };
 
 function buildProgressBar(current, total, length = 20) {
-    const filled = Math.floor((current / total) * length);
-    const empty  = length - filled;
-    return `\`[${'█'.repeat(filled)}${'░'.repeat(empty)}]\` ${current}/${total}`;
+    const safeTotal = Math.max(1, Math.floor(Number(total) || 1));
+    const safeCurrent = Math.min(safeTotal, Math.max(0, Math.floor(Number(current) || 0)));
+    const filled = Math.min(length, Math.max(0, Math.floor((safeCurrent / safeTotal) * length)));
+    const empty = Math.max(0, length - filled);
+    return `\`[${'█'.repeat(filled)}${'░'.repeat(empty)}]\` ${safeCurrent.toLocaleString('pt-BR')}/${safeTotal.toLocaleString('pt-BR')}`;
 }

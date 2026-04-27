@@ -1,13 +1,13 @@
 // src/commands/economy/loja.js
 // ============================================================
-//   Olympus Community Bot — Loja de Itens
+//   Tengoku Community Bot — Loja de Itens
 // ============================================================
 
 const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const { ShopProduct } = require('@models/Shop');
 const UserData = require('@models/UserData');
 const economyManager = require('@utils/managers/economyManager');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -30,9 +30,9 @@ module.exports = {
                 .setColor(PALETTE.accent)
                 .setTitle('🛒 Loja do Servidor')
                 .setDescription(products.map((p, i) => 
-                    `**${i + 1}.** ${p.name} — **${p.price} ${config.currencySymbol}**\n> ${p.description}`
+                    `**${i + 1}.** ${p.name} — **${economyManager.formatCurrency(p.price, config)}**\n> ${p.description}`
                 ).join('\n\n'))
-                .setFooter(olympusFooter('Use /loja comprar <nome> para comprar'))
+                .setFooter(tengokuFooter('Use /loja comprar <nome> para comprar'))
                 .setTimestamp();
 
             return interaction.reply({ embeds: [embed] });
@@ -47,7 +47,7 @@ module.exports = {
 
             const userData = await economyManager.getUser(interaction.user.id, guildId);
             if (userData.balance < product.price) {
-                return interaction.reply({ content: `❌ Saldo insuficiente. Preço: **${product.price} ${config.currencySymbol}** | Saldo: **${userData.balance} ${config.currencySymbol}**`, flags: 64 });
+                return interaction.reply({ content: `❌ Saldo insuficiente. Preço: **${economyManager.formatCurrency(product.price, config)}** | Saldo: **${economyManager.formatCurrency(userData.balance, config)}**`, flags: 64 });
             }
 
             await economyManager.addBalance(interaction.user.id, guildId, -product.price);
@@ -67,8 +67,8 @@ module.exports = {
             const embed = new EmbedBuilder()
                 .setColor(PALETTE.success)
                 .setTitle('🛒 Compra Realizada!')
-                .setDescription(`Você comprou **${product.name}** por **${product.price} ${config.currencySymbol}**!`)
-                .setFooter(olympusFooter('Veja seu inventário com /inventario'))
+                .setDescription(`Você comprou **${product.name}** por **${economyManager.formatCurrency(product.price, config)}**!`)
+                .setFooter(tengokuFooter('Veja seu inventário com /inventario'))
                 .setTimestamp();
 
             return interaction.reply({ embeds: [embed] });

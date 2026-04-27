@@ -1,13 +1,13 @@
 // src/events/moderation/antiSystem.js
 // ============================================================
-//   Olympus Community Bot — Sistema Anti (Moderação Automática)
+//   Tengoku Community Bot — Sistema Anti (Moderação Automática)
 //   Proteções: spam, invite, mass-mention, everyone, links, caps
 // ============================================================
 
 const { EmbedBuilder } = require('discord.js');
 const Guild = require('@models/Guild');
 const ModLog = require('@models/ModLog');
-const { PALETTE, olympusFooter } = require('@utils/helpers/embedHelper');
+const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const logger = require('@utils/logger');
 
 // Cache de mensagens para detecção de spam
@@ -251,7 +251,7 @@ async function applyAction(message, action, type, client, reason, cfg) {
             .setColor(PALETTE.warning)
             .setTitle('🛡️ Ação de Moderação Automática')
             .setDescription(`${message.author}, sua mensagem foi removida.\n\n**Motivo:** ${reason}`)
-            .setFooter(olympusFooter())
+            .setFooter(tengokuFooter())
             .setTimestamp();
 
         const notify = await message.channel.send({ embeds: [notifyEmbed] }).catch(() => null);
@@ -263,7 +263,7 @@ async function applyAction(message, action, type, client, reason, cfg) {
                 .setColor(PALETTE.error)
                 .setTitle(`🚨 Notificação de Punição — ${message.guild.name}`)
                 .setDescription(`Sua mensagem foi removida pela moderação automática.\n\n**Infração:** ${type}\n**Motivo:** ${reason}`)
-                .setFooter(olympusFooter('Comportamento inadequado pode levar a banimento'))
+                .setFooter(tengokuFooter('Comportamento inadequado pode levar a banimento'))
                 .setTimestamp();
             
             await message.author.send({ embeds: [dmEmbed] }).catch(() => null);
@@ -319,7 +319,7 @@ async function handleEscalation(message, client) {
                 .setColor(PALETTE.error)
                 .setTitle('🔇 Silenciamento Automático')
                 .setDescription(`${message.author} foi silenciado por 10 minutos por excesso de infrações.`)
-                .setFooter(olympusFooter())
+                .setFooter(tengokuFooter())
                 .setTimestamp();
                 
             await message.channel.send({ embeds: [escalateEmbed] }).catch(() => null);
@@ -402,7 +402,7 @@ async function logModAction(message, type, reason, action, client, cfg) {
                 { name: 'Conteúdo', value: message.content ? `\`\`\`${message.content.substring(0, 500)}\`\`\`` : '`(sem conteúdo)`', inline: false },
             )
             .setThumbnail(message.author.displayAvatarURL())
-            .setFooter(olympusFooter(`ID: ${message.author.id}`))
+            .setFooter(tengokuFooter(`ID: ${message.author.id}`))
             .setTimestamp();
 
         if (!cfg.hideStaff) {
