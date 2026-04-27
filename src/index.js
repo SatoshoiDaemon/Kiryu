@@ -8,7 +8,7 @@
 //   ╚██████╔╝███████╗██║   ██║ ╚═╝ ██║██║     ╚██████╔╝███████║
 //    ╚═════╝ ╚══════╝╚═╝   ╚═╝     ╚═╝╚═╝      ╚═════╝ ╚══════╝
 //
-//   Community Bot v2.0 — Desenvolvido pela Tengoku
+//   Kiryu — Desenvolvido por Axiom
 // ============================================================
 
 // ── Registro dos aliases de módulo (deve ser a primeira instrução) ──
@@ -48,8 +48,8 @@ const client = new Client({
 // ── Inicialização ─────────────────────────────────────────────
 async function start() {
     try {
-        logger.info('🚀 Iniciando Tengoku Community Bot v2.0...');
-        logger.info('💜 Desenvolvido pela Tengoku');
+        logger.info('🚀 Iniciando Kiryu...');
+        logger.info('💜 Desenvolvido por Axiom');
 
         // Inicializa o banco de dados
         await initializeDatabase();

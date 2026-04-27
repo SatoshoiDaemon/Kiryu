@@ -36,10 +36,10 @@ async function runAffinityDegradation(client) {
     }
 }
 
-// Inicia um loop global com verificação a cada 1 hora
+// Inicia um loop global com verificação diária
 function startAffinityTracker(client) {
     runAffinityDegradation(client);
-    setInterval(() => runAffinityDegradation(client), 60 * 60 * 1000);
+    setInterval(() => runAffinityDegradation(client), DAY_IN_MS);
 }
 
 module.exports = { startAffinityTracker };

@@ -14,6 +14,7 @@ const helpHandler = require('@handlers/interactions/helpHandler');
 const partnershipHandler = require('@handlers/interactions/partnershipHandler');
 const rulesHandler = require('@handlers/interactions/rulesHandler');
 const autoResponseHandler = require('@handlers/interactions/autoResponseHandler');
+const ticketManager = require('@utils/managers/ticketManager');
 
 module.exports = {
     name: 'interactionCreate',
@@ -91,6 +92,11 @@ async function handleSelectMenu(interaction) {
         // Menus das Auto Respostas
         if (id.startsWith('ar:')) {
             return await autoResponseHandler.handleSelect(interaction);
+        }
+
+        // Menus de Ticket
+        if (id.startsWith('ticket:')) {
+            return await ticketManager.handleInteraction(interaction);
         }
 
         // Fallback: interação não reconhecida
@@ -172,6 +178,11 @@ async function handleButton(interaction) {
             return await autoResponseHandler.handleButton(interaction);
         }
 
+        // Botões de Ticket
+        if (id.startsWith('ticket:')) {
+            return await ticketManager.handleInteraction(interaction);
+        }
+
         // Fallback: botão não reconhecido
         if (!interaction.replied && !interaction.deferred) {
             return interaction.reply({ content: '❌ Ação não reconhecida.', flags: 64 });
@@ -229,6 +240,11 @@ async function handleModal(interaction) {
                 return await autoResponseHandler.handleModal(interaction);
             }
             return await configHandler.handleModal(interaction);
+        }
+
+        // Modais de Ticket
+        if (id.startsWith('ticket:')) {
+            return await ticketManager.handleInteraction(interaction);
         }
 
         // Fallback: modal não reconhecido

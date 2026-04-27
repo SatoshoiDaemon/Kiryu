@@ -13,7 +13,7 @@ module.exports = {
             return interaction.reply({ content: '❌ Este comando só pode ser usado em servidores.', flags: 64 });
         }
 
-        await interaction.deferReply({ flags: 64 });
+        await interaction.deferReply({ ephemeral: true });
         await autoResponseHandler.showDashboard(interaction, false);
     },
 };
