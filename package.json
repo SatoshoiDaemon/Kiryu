@@ -39,6 +39,7 @@
     "@events": "src/events",
     "@handlers": "src/handlers",
     "@utils": "src/utils",
+    "@services": "src/services",
     "@database": "src/database",
     "@models": "src/database/models"
   }
