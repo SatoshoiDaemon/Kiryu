@@ -48,6 +48,7 @@ function buildMainEmbed(branding) {
             '⭐ **XP & Níveis** — Sistema de experiência e recompensas\n' +
             '🛡️ **Moderação** — Anti-spam, anti-invite, logs e proteções\n' +
             '🔑 **Permissões** — Controle granular de acesso aos comandos\n' +
+            '🎫 **Tickets** — Configure painéis, opções e fluxo de atendimento\n' +
             '🚀 **Sistemas** — Sugestões, parcerias, starboard e instafeed\n' +
             '🎨 **Aparência** — Cores, nome e identidade visual do bot'
         )
@@ -85,6 +86,10 @@ function buildMainMenu() {
                 .setLabel('🔑 Permissões de Comandos')
                 .setDescription('Controle granular de acesso por cargo/usuário')
                 .setValue('cfg:perms'),
+            new StringSelectMenuOptionBuilder()
+                .setLabel('🎫 Tickets')
+                .setDescription('Configure painéis, opções e fluxo de tickets')
+                .setValue('cfg:ticket'),
             new StringSelectMenuOptionBuilder()
                 .setLabel('🚀 Sistemas Extras')
                 .setDescription('Sugestões, parcerias, starboard e instafeed')

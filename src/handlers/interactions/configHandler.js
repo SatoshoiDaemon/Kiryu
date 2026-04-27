@@ -24,6 +24,8 @@ const { PALETTE, tengokuFooter } = require('@utils/helpers/embedHelper');
 const brandingManager = require('@utils/managers/brandingManager');
 const permissionsManager = require('@utils/managers/permissionsManager');
 const economyManager = require('@utils/managers/economyManager');
+const TicketPanel = require('@models/TicketPanel');
+const { buildPanelComponents } = require('@utils/ticketComponents');
 const logger = require('@utils/logger');
 
 // ── Botão de voltar ao menu principal ────────────────────────
@@ -85,6 +87,7 @@ async function showMain(interaction) {
             '⭐ **XP & Níveis** — Sistema de experiência e recompensas\n' +
             '🛡️ **Moderação** — Anti-spam, anti-invite, logs e proteções\n' +
             '🔑 **Permissões** — Controle granular de acesso aos comandos\n' +
+            '🎫 **Tickets** — Configure painéis, opções e fluxo de atendimento\n' +
             '🚀 **Sistemas** — Sugestões, parcerias, starboard e instafeed\n' +
             '🎨 **Aparência** — Cores, nome e identidade visual do bot'
         )
@@ -101,6 +104,7 @@ async function showMain(interaction) {
             { label: '⭐ XP & Níveis', description: 'Sistema de experiência e recompensas', value: 'cfg:xp' },
             { label: '🛡️ Moderação & Proteção', description: 'Anti-spam, anti-invite, logs e proteções', value: 'cfg:mod' },
             { label: '🔑 Permissões de Comandos', description: 'Controle granular de acesso por cargo/usuário', value: 'cfg:perms' },
+            { label: '🎫 Tickets', description: 'Configure painéis, opções e fluxo de tickets', value: 'cfg:ticket' },
             { label: '🚀 Sistemas Extras', description: 'Sugestões, parcerias, starboard e instafeed', value: 'cfg:systems' },
             { label: '🎨 Aparência', description: 'Cores, nome e identidade visual do bot', value: 'cfg:branding' },
         );
@@ -403,6 +407,231 @@ async function showPerms(interaction) {
     await interaction.update({ embeds: [embed], components: [row, backButton()] });
 }
 
+function createTicketPanelId() {
+    return `panel_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function createTicketOptionId() {
+    return `opt_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+}
+
+function normalizeTicketFieldId(label, index) {
+    const cleaned = label.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+    return cleaned ? `field_${cleaned}` : `field_${index + 1}`;
+}
+
+function parseTicketFormFields(raw) {
+    if (!raw) return [];
+    return raw
+        .split(/\r?\n/)
+        .map((line, index) => line.trim())
+        .filter(Boolean)
+        .slice(0, 5)
+        .map((label, index) => ({
+            fieldId: normalizeTicketFieldId(label, index),
+            label,
+            placeholder: null,
+            type: 'short',
+            required: true,
+        }));
+}
+
+async function showTickets(interaction) {
+    const guildId = interaction.guildId;
+    const color = await guildColor(guildId);
+    const panels = await TicketPanel.find({ guildId }).sort({ createdAt: -1 });
+
+    const embed = new EmbedBuilder()
+        .setColor(color)
+        .setTitle('🎫 Configuração — Tickets')
+        .setDescription('Configure painéis de ticket, opções e envio de mensagens do painel. Use o botão para criar um painel e selecione-o para editar.')
+        .addFields(
+            { name: 'Painéis encontrados', value: panels.length ? `
+• ${panels.length} painel(s) configurado(s)` : '`Nenhum painel configurado`', inline: false },
+            { name: 'Aviso', value: 'Cada painel precisa ser enviado em um canal para abrir tickets. Use o botão de enviar/atualizar abaixo.', inline: false },
+        )
+        .setFooter(tengokuFooter());
+
+    const rows = [];
+    rows.push(new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId('cfg:ticket:create').setLabel('Criar Painel').setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId('cfg:ticket:refresh').setLabel('Atualizar Lista').setStyle(ButtonStyle.Secondary),
+    ));
+
+    if (panels.length) {
+        const list = panels.map((panel, index) => {
+            const status = panel.messageId ? '✅ Enviado' : '❌ Não enviado';
+            return `**${index + 1}.** ${panel.name} — 
+Canal: <#${panel.channelId}> • ${panel.mode} • ${status}`;
+        }).join('\n\n').slice(0, 1024);
+
+        embed.addFields({ name: 'Painéis', value: list, inline: false });
+        rows.push(new ActionRowBuilder().addComponents(
+            new StringSelectMenuBuilder()
+                .setCustomId('cfg:sel:ticket_panel')
+                .setPlaceholder('Selecione um painel para editar...')
+                .addOptions(
+                    panels.slice(0, 25).map(panel => ({ label: panel.name, description: `Modo: ${panel.mode} • ${panel.options.length} opção(ões)`, value: panel.panelId }))
+                )
+        ));
+    }
+
+    await interaction.update({ embeds: [embed], components: rows });
+}
+
+async function showTicketPanel(interaction, panelId) {
+    const guildId = interaction.guildId;
+    const panel = await TicketPanel.findOne({ guildId, panelId });
+    if (!panel) {
+        return interaction.reply({ content: '❌ Painel de ticket não encontrado.', flags: 64 });
+    }
+
+    const statusText = panel.messageId ? `✅ Enviado em <#${panel.channelId}>` : '❌ Ainda não enviado';
+    const optionsText = panel.options.length
+        ? panel.options.map((option, index) => `**${index + 1}.** ${option.label}${option.emoji ? ` ${option.emoji}` : ''} — ${option.description || 'Sem descrição'}`).join('\n')
+        : '`Nenhuma opção configurada`';
+
+    const embed = new EmbedBuilder()
+        .setColor(await guildColor(guildId))
+        .setTitle(`🎫 Painel de Ticket — ${panel.name}`)
+        .setDescription('Edite o painel de ticket, configure categorias e envie/atualize a mensagem do painel.')
+        .addFields(
+            { name: 'Canal do Painel', value: panel.channelId ? `<#${panel.channelId}>` : '`Não configurado`', inline: true },
+            { name: 'Modo', value: panel.mode || 'buttons', inline: true },
+            { name: 'Status', value: statusText, inline: true },
+            { name: 'Categoria de Tickets', value: panel.ticketCategoryId ? `<#${panel.ticketCategoryId}>` : '`Nenhuma`', inline: true },
+            { name: 'Categoria de Tickets Fechados', value: panel.closedTicketCategoryId ? `<#${panel.closedTicketCategoryId}>` : '`Nenhuma`', inline: true },
+            { name: 'Limite por usuário', value: `${panel.maxOpenTicketsPerUser || 1}`, inline: true },
+            { name: 'Canal de Logs', value: panel.logChannelId ? `<#${panel.logChannelId}>` : '`Nenhum`', inline: true },
+            { name: 'Canal de Transcrições', value: panel.transcriptChannelId ? `<#${panel.transcriptChannelId}>` : '`Nenhum`', inline: true },
+            { name: 'Opções', value: optionsText, inline: false },
+        )
+        .setFooter(tengokuFooter())
+        .setTimestamp();
+
+    const row1 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId(`cfg:ticket:edit:${panelId}`).setLabel('Editar Painel').setStyle(ButtonStyle.Primary),
+        new ButtonBuilder().setCustomId(`cfg:ticket:deploy:${panelId}`).setLabel(panel.messageId ? 'Atualizar Painel' : 'Enviar Painel').setStyle(ButtonStyle.Success),
+        new ButtonBuilder().setCustomId(`cfg:ticket:add_option:${panelId}`).setLabel('Adicionar Opção').setStyle(ButtonStyle.Secondary),
+    );
+    const row2 = new ActionRowBuilder().addComponents(
+        new ChannelSelectMenuBuilder()
+            .setCustomId(`cfg:sel:ticket_panel_channel:${panelId}`)
+            .setPlaceholder('Selecionar canal do painel...')
+            .setChannelTypes(ChannelType.GuildText)
+    );
+    const row3 = new ActionRowBuilder().addComponents(
+        new ChannelSelectMenuBuilder()
+            .setCustomId(`cfg:sel:ticket_ticket_category:${panelId}`)
+            .setPlaceholder('Selecionar categoria de tickets...')
+            .setChannelTypes(ChannelType.GuildCategory)
+    );
+    const row4 = new ActionRowBuilder().addComponents(
+        new ChannelSelectMenuBuilder()
+            .setCustomId(`cfg:sel:ticket_closed_category:${panelId}`)
+            .setPlaceholder('Selecionar categoria de tickets fechados...')
+            .setChannelTypes(ChannelType.GuildCategory)
+    );
+    const row5 = new ActionRowBuilder().addComponents(
+        new ButtonBuilder().setCustomId(`cfg:ticket:delete:${panelId}`).setLabel('Excluir Painel').setStyle(ButtonStyle.Danger),
+        new ButtonBuilder().setCustomId('cfg:ticket:back').setLabel('← Voltar a Tickets').setStyle(ButtonStyle.Secondary),
+    );
+
+    await interaction.update({ embeds: [embed], components: [row1, row2, row3, row4, row5] });
+}
+
+async function showTicketCreateModal(interaction) {
+    return showModal(interaction, 'modal:ticket:create', 'Criar Painel de Ticket', [
+        { id: 'ticket_name', label: 'Nome do Painel', placeholder: 'Atendimento Geral', style: TextInputStyle.Short },
+        { id: 'ticket_channel_id', label: 'ID do Canal do Painel', placeholder: '123456789012345678', style: TextInputStyle.Short },
+        { id: 'ticket_mode', label: 'Modo (buttons ou select)', placeholder: 'buttons', style: TextInputStyle.Short },
+        { id: 'ticket_log_channel', label: 'ID do Canal de Logs (opcional)', placeholder: '123456789012345678', style: TextInputStyle.Short, required: false },
+        { id: 'ticket_transcript_channel', label: 'ID do Canal de Transcrições (opcional)', placeholder: '123456789012345678', style: TextInputStyle.Short, required: false },
+    ]);
+}
+
+async function showTicketEditModal(interaction, panelId) {
+    const guildId = interaction.guildId;
+    const panel = await TicketPanel.findOne({ guildId, panelId });
+    if (!panel) {
+        return interaction.reply({ content: '❌ Painel de ticket não encontrado.', flags: 64 });
+    }
+
+    return showModal(interaction, `modal:ticket:edit:${panelId}`, 'Editar Painel de Ticket', [
+        { id: 'ticket_name', label: 'Nome do Painel', placeholder: 'Atendimento Geral', style: TextInputStyle.Short, required: true, value: panel.name },
+        { id: 'ticket_mode', label: 'Modo (buttons ou select)', placeholder: 'buttons', style: TextInputStyle.Short, required: true, value: panel.mode || 'buttons' },
+        { id: 'ticket_max_open', label: 'Tickets abertos por usuário', placeholder: '1', style: TextInputStyle.Short, required: false, value: String(panel.maxOpenTicketsPerUser || 1) },
+        { id: 'ticket_log_channel', label: 'ID do Canal de Logs (opcional)', placeholder: '123456789012345678', style: TextInputStyle.Short, required: false, value: panel.logChannelId || '' },
+        { id: 'ticket_transcript_channel', label: 'ID do Canal de Transcrições (opcional)', placeholder: '123456789012345678', style: TextInputStyle.Short, required: false, value: panel.transcriptChannelId || '' },
+    ]);
+}
+
+async function showTicketAddOptionModal(interaction, panelId) {
+    return showModal(interaction, `modal:ticket:add_option:${panelId}`, 'Adicionar Opção de Ticket', [
+        { id: 'option_label', label: 'Rótulo da Opção', placeholder: 'Suporte', style: TextInputStyle.Short },
+        { id: 'option_description', label: 'Descrição', placeholder: 'Abra um ticket de suporte', style: TextInputStyle.Short, required: false },
+        { id: 'option_emoji', label: 'Emoji (opcional)', placeholder: '🎟️', style: TextInputStyle.Short, required: false },
+        { id: 'option_style', label: 'Estilo do Botão (Primary, Secondary, Success, Danger)', placeholder: 'Primary', style: TextInputStyle.Short, required: false },
+        { id: 'option_form', label: 'Perguntas do Formulário (uma por linha)', placeholder: 'Qual o motivo do atendimento?\nDescreva sua dúvida', style: TextInputStyle.Paragraph, required: false },
+    ]);
+}
+
+async function deployTicketPanel(interaction, panelId) {
+    const guildId = interaction.guildId;
+    const panel = await TicketPanel.findOne({ guildId, panelId });
+    if (!panel) {
+        return interaction.reply({ content: '❌ Painel de ticket não encontrado.', flags: 64 });
+    }
+    if (!panel.channelId) {
+        return interaction.reply({ content: '❌ Configure primeiro o canal do painel.', flags: 64 });
+    }
+    if (!panel.options.length) {
+        return interaction.reply({ content: '❌ Adicione ao menos uma opção ao painel antes de enviá-lo.', flags: 64 });
+    }
+
+    const guild = interaction.guild;
+    if (!guild) {
+        return interaction.reply({ content: '❌ Guild não disponível.', flags: 64 });
+    }
+
+    const channel = await guild.channels.fetch(panel.channelId).catch(() => null);
+    if (!channel) {
+        return interaction.reply({ content: '❌ Canal do painel não encontrado.', flags: 64 });
+    }
+
+    const embed = new EmbedBuilder()
+        .setColor(panel.embed?.color || PALETTE.accent)
+        .setTitle(panel.embed?.title || panel.name || 'Painel de Ticket')
+        .setDescription(panel.embed?.description || 'Selecione uma opção abaixo para abrir um ticket.')
+        .setFooter({ text: panel.embed?.footer || 'Atendimento de tickets' });
+
+    if (panel.embed?.image) embed.setImage(panel.embed.image);
+    if (panel.embed?.thumbnail) embed.setThumbnail(panel.embed.thumbnail);
+
+    const components = buildPanelComponents(panel);
+    let message;
+
+    if (panel.messageId) {
+        const existing = await channel.messages.fetch(panel.messageId).catch(() => null);
+        if (existing) {
+            message = await existing.edit({ embeds: [embed], components }).catch(() => null);
+        }
+    }
+
+    if (!message) {
+        message = await channel.send({ embeds: [embed], components }).catch(() => null);
+    }
+
+    if (!message) {
+        return interaction.reply({ content: '❌ Falha ao enviar/atualizar o painel. Verifique permissões e canal.', flags: 64 });
+    }
+
+    panel.messageId = message.id;
+    await panel.save();
+
+    return showTicketPanel(interaction, panelId);
+}
+
 // ═══════════════════════════════════════════════════════════════
 //   HANDLER DE SELEÇÃO DE MENU
 // ═══════════════════════════════════════════════════════════════
@@ -418,6 +647,7 @@ async function handleSelect(interaction) {
             case 'cfg:xp': return showXP(interaction);
             case 'cfg:mod': return showMod(interaction);
             case 'cfg:perms': return showPerms(interaction);
+            case 'cfg:ticket': return showTickets(interaction);
             case 'cfg:systems': return showSystems(interaction);
             case 'cfg:branding': return showBranding(interaction);
         }
@@ -442,6 +672,24 @@ async function handleSelect(interaction) {
         if (id === 'cfg:sel:xp_channel') {
             await upsertConfig(guildId, 'xpConfig', { notificationChannel: value });
             return interaction.reply({ content: `✅ Canal de notificação do XP definido para <#${value}>.`, flags: 64 });
+        }
+        if (id === 'cfg:sel:ticket_panel') {
+            return showTicketPanel(interaction, value);
+        }
+        if (id.startsWith('cfg:sel:ticket_panel_channel:')) {
+            const panelId = id.split(':').pop();
+            await TicketPanel.findOneAndUpdate({ guildId, panelId }, { channelId: value });
+            return showTicketPanel(interaction, panelId);
+        }
+        if (id.startsWith('cfg:sel:ticket_ticket_category:')) {
+            const panelId = id.split(':').pop();
+            await TicketPanel.findOneAndUpdate({ guildId, panelId }, { ticketCategoryId: value });
+            return showTicketPanel(interaction, panelId);
+        }
+        if (id.startsWith('cfg:sel:ticket_closed_category:')) {
+            const panelId = id.split(':').pop();
+            await TicketPanel.findOneAndUpdate({ guildId, panelId }, { closedTicketCategoryId: value });
+            return showTicketPanel(interaction, panelId);
         }
         if (id === 'cfg:sel:sug_channel') {
             await upsertConfig(guildId, 'suggestionsConfig', { channelId: value, enabled: true });
@@ -732,6 +980,32 @@ async function handleButton(interaction) {
             { id: 'perm_id', label: 'ID do Cargo ou Usuário', placeholder: '123456789012345678', style: TextInputStyle.Short },
         ]);
     }
+    if (id === 'cfg:ticket:create') {
+        return showTicketCreateModal(interaction);
+    }
+    if (id === 'cfg:ticket:refresh') {
+        return showTickets(interaction);
+    }
+    if (id.startsWith('cfg:ticket:edit:')) {
+        const panelId = id.split(':').pop();
+        return showTicketEditModal(interaction, panelId);
+    }
+    if (id.startsWith('cfg:ticket:add_option:')) {
+        const panelId = id.split(':').pop();
+        return showTicketAddOptionModal(interaction, panelId);
+    }
+    if (id.startsWith('cfg:ticket:deploy:')) {
+        const panelId = id.split(':').pop();
+        return deployTicketPanel(interaction, panelId);
+    }
+    if (id.startsWith('cfg:ticket:delete:')) {
+        const panelId = id.split(':').pop();
+        await TicketPanel.deleteOne({ guildId: interaction.guildId, panelId });
+        return showTickets(interaction);
+    }
+    if (id === 'cfg:ticket:back') {
+        return showTickets(interaction);
+    }
     if (id === 'cfg:perms:remove') {
         return showModal(interaction, 'modal:perms:remove', 'Remover Permissão de Comando', [
             { id: 'perm_command_rm', label: 'Nome do Comando (sem /)', placeholder: 'ban', style: TextInputStyle.Short },
@@ -973,6 +1247,64 @@ async function handleModal(interaction) {
             if (!['role', 'user'].includes(type)) return interaction.reply({ content: '❌ Tipo inválido. Use `role` ou `user`.', flags: 64 });
             await permissionsManager.addPermission(guildId, command, type, id);
             return interaction.reply({ content: `✅ Permissão adicionada: \`/${command}\` → ${type} \`${id}\`.`, flags: 64 });
+        }
+        if (customId === 'modal:ticket:create') {
+            const name = fields.getTextInputValue('ticket_name').trim();
+            const channelId = fields.getTextInputValue('ticket_channel_id').trim();
+            const mode = fields.getTextInputValue('ticket_mode').trim().toLowerCase() === 'select' ? 'select' : 'buttons';
+            const logChannelId = fields.getTextInputValue('ticket_log_channel').trim() || null;
+            const transcriptChannelId = fields.getTextInputValue('ticket_transcript_channel').trim() || null;
+            const panelId = createTicketPanelId();
+
+            await TicketPanel.create({
+                guildId,
+                panelId,
+                name,
+                channelId,
+                mode,
+                options: [],
+                logChannelId,
+                transcriptChannelId,
+                maxOpenTicketsPerUser: 1,
+            });
+
+            return interaction.reply({ content: '✅ Painel de ticket criado! Use a lista para selecionar e configurar as opções.', flags: 64 });
+        }
+        if (customId.startsWith('modal:ticket:edit:')) {
+            const panelId = customId.split(':').pop();
+            const name = fields.getTextInputValue('ticket_name').trim();
+            const mode = fields.getTextInputValue('ticket_mode').trim().toLowerCase() === 'select' ? 'select' : 'buttons';
+            const maxOpen = parseInt(fields.getTextInputValue('ticket_max_open')) || 1;
+            const logChannelId = fields.getTextInputValue('ticket_log_channel').trim() || null;
+            const transcriptChannelId = fields.getTextInputValue('ticket_transcript_channel').trim() || null;
+
+            await TicketPanel.findOneAndUpdate(
+                { guildId, panelId },
+                { name, mode, maxOpenTicketsPerUser: maxOpen, logChannelId, transcriptChannelId }
+            );
+
+            return interaction.reply({ content: '✅ Painel atualizado com sucesso!', flags: 64 });
+        }
+        if (customId.startsWith('modal:ticket:add_option:')) {
+            const panelId = customId.split(':').pop();
+            const label = fields.getTextInputValue('option_label').trim();
+            const description = fields.getTextInputValue('option_description').trim() || null;
+            const emoji = fields.getTextInputValue('option_emoji').trim() || null;
+            const styleRaw = fields.getTextInputValue('option_style').trim() || 'Primary';
+            const formRaw = fields.getTextInputValue('option_form').trim();
+            const styleCandidate = styleRaw.toLowerCase();
+            const style = ['primary', 'secondary', 'success', 'danger'].includes(styleCandidate)
+                ? styleCandidate.charAt(0).toUpperCase() + styleCandidate.slice(1)
+                : 'Primary';
+            const form = parseTicketFormFields(formRaw);
+            const optionId = createTicketOptionId();
+
+            await TicketPanel.findOneAndUpdate(
+                { guildId, panelId },
+                { $push: { options: { optionId, label, description, emoji, style, form } } }
+            );
+
+            return interaction.reply({ content: `✅ Opção **${label}** adicionada ao painel!`, flags: 64 });
         }
         if (customId === 'modal:perms:remove') {
             const command = fields.getTextInputValue('perm_command_rm').toLowerCase();
